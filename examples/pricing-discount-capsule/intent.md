@@ -21,7 +21,7 @@ The durable business intent is:
 | Silver loyalty | Customer tier = Silver | +5% |
 | Large basket | Basket total ≥ 500 | +3% |
 | Active campaign | active_campaign = true | +2% |
-| Maximum cap | Combined total > 15% | capped at 15% |
+| Maximum cap | Combined total ≥ 15% | capped at 15% |
 
 These rules are subject to change. When rules change, update this document, the tests, the contract, and the regeneration recipe.
 

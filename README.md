@@ -4,7 +4,9 @@
 
 ## One-Sentence Definition
 
-Regenerable Architecture is a software architecture approach where implementation code—especially AI-generated code—is treated as disposable, while intent, contracts, tests, data semantics, and operational expectations are preserved as durable assets from which the implementation can be safely recreated.
+**Regenerable Architecture** preserves intent, contracts, tests, data semantics, and operational expectations as durable artifacts—and treats implementation code, especially AI-generated code, as disposable. When implementation quality decays past a measurable threshold, it is discarded and regenerated from those preserved artifacts rather than refactored in place.
+
+The individual ingredients are established: evolutionary architecture, fitness functions, contract-first design, disposable infrastructure, code generation. The synthesis is the AI-era lifecycle that ties them together: *specify → generate → operate → measure slop → regenerate*.
 
 ---
 
@@ -14,17 +16,17 @@ AI coding tools make generating implementation code cheap. The problem is not th
 
 Over time, AI-generated code accumulates subtle problems:
 
-- Logic that passed tests but drifted from business intent
-- Patterns copied from training data without fitting the actual problem
-- Abstractions added for cleverness, not clarity
-- Dependencies added without ownership or review
-- Tests that verify behavior the AI invented rather than behavior the business requires
+- Logic that passes tests but has drifted from business intent
+- Patterns borrowed from training data that don't fit the actual problem
+- Abstractions added for pattern-matching, not for the problem at hand
+- Dependencies pulled in for one line of convenience
+- Tests that verify behavior the AI invented, not behavior the business requires
 
-This is **AI slop**: the slow accumulation of implementation debt that looks fine on the surface but erodes trust in the system.
+This is **AI slop**: accumulated implementation decay that looks acceptable in isolation but erodes the system's trustworthiness over time.
 
-Traditional refactoring helps. But sometimes the right move is not to refactor—it is to **regenerate from scratch**, guided by durable artifacts that were never thrown away.
+The answer is not more code review. Reviewing every AI-generated line for subtle correctness is expensive and unreliable. The answer is to design systems so that decayed implementation can be safely discarded and recreated—and to preserve the knowledge needed to do that safely.
 
-Regenerable Architecture makes this safe and deliberate.
+Regenerable Architecture provides that design.
 
 ---
 
@@ -41,19 +43,19 @@ flowchart LR
     F --> C
 ```
 
-This differs from classic evolutionary architecture:
+Regenerable Architecture builds on evolutionary architecture but takes a different stance on what to preserve and what to discard:
 
-| Approach | Slogan |
+| Approach | Principle |
 |---|---|
 | Evolutionary architecture | Make systems easy to change |
 | Disposable architecture | Make components easy to replace |
-| **Regenerable architecture** | **Make implementation cheap and safe to recreate from durable knowledge** |
+| **Regenerable architecture** | **Make implementation safe to recreate from preserved intent** |
 
 Classic evolutionary architecture says: *build → measure → refactor → evolve*.
 
 Regenerable Architecture says: *specify → generate → operate → measure slop → regenerate*.
 
-The difference is that regeneration is not a failure mode. It is a planned, supported lifecycle event. The architecture is designed around it from the start.
+The key difference is that regeneration is not treated as a failure mode. It is a planned, tool-supported lifecycle event that the architecture is designed around from the start.
 
 ---
 
@@ -85,25 +87,25 @@ flowchart TB
 
 | Artifact | Why Durable |
 |---|---|
-| `intent.md` | Captures the business reason the capsule exists |
-| OpenAPI / AsyncAPI contracts | The public commitment to callers |
-| Acceptance tests | Behavioral proof of what the system must do |
-| Invariant / property tests | The rules that must never be violated |
-| Data semantics | What the data means and who owns it |
-| Operational SLOs | Latency, error rate, throughput expectations |
-| Regeneration recipe | How to recreate the implementation correctly |
-| Fitness function thresholds | What "healthy" looks like, defined in advance |
+| `intent.md` | The business reason the capsule exists; survives every regeneration |
+| OpenAPI / AsyncAPI contracts | The public commitment to callers; callers depend on this |
+| Acceptance tests | Behavioral proof of what the system must do, independent of implementation |
+| Invariant / property tests | Rules that must hold for all inputs, regardless of how the code is structured |
+| Data semantics | What each field means, who owns it, how it relates to the domain |
+| Operational SLOs | Latency, error rate, and throughput expectations |
+| Regeneration recipe | Step-by-step instructions for recreating the implementation correctly |
+| Fitness function thresholds | The team's definition of "healthy"—set in advance, not rationalized after the fact |
 
-### Disposable (safe to throw away and recreate)
+### Disposable (safe to discard and recreate)
 
 | Artifact | Why Disposable |
 |---|---|
-| Implementation code | Can be regenerated if durable artifacts are strong |
+| Implementation code | Recreatable when durable artifacts are strong |
 | Framework glue | Can be rewritten for any framework that fits the contract |
-| Local optimizations | Should be re-derived after regeneration |
-| Generated tests for implementation details | Can drift; prefer behavioral tests |
+| Local optimizations | Should be re-derived after regeneration, not carried forward blindly |
+| Tests for implementation internals | Likely to break on regeneration for the wrong reasons |
 
-This does not mean the implementation is unimportant. It means the architecture is designed so that the implementation can be recreated without loss of knowledge or trust.
+The implementation is not unimportant. It is just not the artifact that carries long-term trust. The durable layer carries that.
 
 ---
 
@@ -131,15 +133,15 @@ flowchart TB
     Recipe --> Implementation
 ```
 
-A capability capsule does **not** have to be a microservice. It can be:
+A capability capsule is **not** a microservice. It can be:
 
 - A Python module or package
 - A serverless function group
-- A workflow or job
+- A workflow or scheduled job
 - A domain layer inside a modular monolith
-- A deployable service when isolation genuinely matters
+- A deployable service when isolation genuinely justifies the overhead
 
-The boundary is conceptual, not deployment-topology.
+The boundary is conceptual and knowledge-preserving, not a deployment-topology decision.
 
 ---
 
@@ -149,22 +151,23 @@ The boundary is conceptual, not deployment-topology.
 
 Signs of AI slop:
 
-- Functions that are technically correct but too long to reason about
-- Abstractions introduced for pattern-matching, not for the actual problem
-- Duplicated logic in slightly different forms
-- Imports pulled in for one line of convenience
+- Functions that are technically correct but too long to reason about confidently
+- Abstractions that exist because the model completed a pattern, not because the problem requires them
+- Duplicated logic in slightly different forms across the codebase
+- Imports pulled in for a single line of convenience
 - Tests that verify AI-invented behavior, not business behavior
-- Terminology that drifted from the domain vocabulary
-- Comments that explain what the code does, not why
-- Business rules embedded in utility functions where they will not be found
+- Implementation vocabulary that has drifted from the domain
+- Business rules embedded in utility functions where they will not be found on review
 
 AI slop is not malicious. It is the natural byproduct of generation without architectural discipline.
+
+See [docs/ai-slop.md](docs/ai-slop.md) for a detailed taxonomy and how each pattern manifests.
 
 ---
 
 ## Slop Fitness Functions
 
-Slop is measurable. The architecture includes fitness functions that run continuously or on a schedule.
+Slop is measurable. The architecture includes automated fitness functions that run continuously or on demand.
 
 ### Slop Score Formula
 
@@ -178,7 +181,7 @@ Slop Score =
 - test_confidence_score
 ```
 
-Normalized to 0–100.
+Normalized to 0–100. Test confidence is subtracted because strong tests reduce the risk that slop has caused undetected behavioral drift.
 
 | Score | Status | Recommended Action |
 |---|---|---|
@@ -187,6 +190,8 @@ Normalized to 0–100.
 | 51–70 | Warning | Refactor |
 | 71–85 | High | Regenerate |
 | 86–100 | Critical | Urgent regeneration |
+
+Thresholds are configurable. A team with comprehensive test coverage may tolerate higher complexity; a regulated-domain team may want stricter thresholds on semantic drift.
 
 See [fitness-functions/](fitness-functions/) for working implementations.
 
@@ -211,24 +216,24 @@ flowchart TD
 
 **Refactor** when:
 - The slop score is low
-- The change is localized
-- The existing logic is well-understood
+- The change is localized and the logic is well-understood
+- The existing implementation is a reasonable foundation for the change
 
 **Regenerate** when:
-- The slop score is high
-- The implementation has drifted from intent
-- A broader change makes a clean slate cheaper than surgery
+- The slop score is above the regeneration threshold
+- The implementation has diverged from intent widely enough that surgery is riskier than a clean start
+- A significant requirement change makes the existing structure a poor foundation
 - You cannot confidently explain what the current implementation does
 
-The key insight: regeneration is only safe when durable artifacts are strong. If tests are weak, strengthen them before regenerating—not after.
+The key constraint: regeneration is only safe when the durable artifacts are strong. If tests are weak, strengthen them first. A regeneration guided by poor tests produces a new implementation with the same or different behavioral gaps—and no way to detect them.
 
 ---
 
 ## Data Strategies for Many Capsules
 
-When a system has many capability capsules, data ownership becomes critical.
+When a system has many capability capsules, data ownership becomes a systemic concern.
 
-Avoid the **distributed slop** anti-pattern: each disposable capsule owns its own canonical database, leading to duplicated models, inconsistent behavior, and unmappable state.
+The anti-pattern to avoid is **distributed slop**: each disposable capsule owns its own canonical database, leading to duplicated domain models, inconsistent data semantics, and unresolvable conflicts when capsules need to be reconciled or regenerated.
 
 ```mermaid
 flowchart TD
@@ -242,53 +247,53 @@ flowchart TD
     H --> I[Create Migration / Export Contract]
 ```
 
-Every capsule should classify its data:
+Every capsule should classify its data before owning it:
 
-- **Canonical** — must be owned by a durable domain API
-- **Derived** — projection; can be rebuilt
-- **Ephemeral** — TTL-scoped; loss is acceptable
-- **Audit** — append-only; must survive regeneration
-- **Configuration** — governs behavior; should be externalized
-- **Personal/sensitive** — requires lifecycle governance
+| Class | Description | Lifecycle |
+|---|---|---|
+| **Canonical** | Authoritative business record | Must survive capsule regeneration; own via a durable domain API |
+| **Derived** | Projection of canonical data | Can be discarded and rebuilt; owned by the capsule |
+| **Ephemeral** | Temporary state with a TTL | Loss is acceptable; session caches, rate counters, drafts |
+| **Audit** | Append-only record of events | Must survive regeneration; append-only means safe to preserve |
+| **Configuration** | Governs behavior | Externalize from the implementation |
+| **Personal/sensitive** | Subject to privacy regulation | Requires lifecycle governance regardless of capsule lifecycle |
 
-See [docs/data-strategies.md](docs/data-strategies.md) for the full treatment.
+Only canonical, audit, and personal/sensitive data require strong durability discipline. The rest can be treated as part of the disposable layer.
+
+See [docs/data-strategies.md](docs/data-strategies.md) for the full treatment including outbox/inbox patterns, event replay, and migration contracts.
 
 ---
 
-## Example Repository Structure
+## Repository Structure
 
 ```
 regenerable-architecture/
 ├── README.md
 ├── docs/
-│   ├── concept.md
-│   ├── novelty.md
-│   ├── ai-slop.md
-│   ├── data-strategies.md
-│   ├── anti-patterns.md
-│   └── open-questions.md
+│   ├── concept.md           ← in-depth explanation of the architecture
+│   ├── novelty.md           ← what is new, what is borrowed
+│   ├── ai-slop.md           ← taxonomy of AI slop patterns
+│   ├── data-strategies.md   ← data ownership strategies for capsule systems
+│   ├── anti-patterns.md     ← failure modes and how to avoid them
+│   └── open-questions.md    ← unresolved questions
 ├── examples/
 │   └── pricing-discount-capsule/
-│       ├── intent.md
-│       ├── regeneration-recipe.md
+│       ├── intent.md                ← durable: business intent
+│       ├── regeneration-recipe.md   ← durable: how to regenerate
 │       ├── contracts/
-│       │   └── openapi.yaml
+│       │   └── openapi.yaml         ← durable: public API contract
 │       ├── src/
-│       │   └── pricing_discount_service.py
+│       │   └── pricing_discount_service.py  ← disposable: implementation
 │       ├── tests/
-│       │   ├── test_acceptance.py
-│       │   ├── test_contract.py
-│       │   └── test_invariants.py
+│       │   ├── test_acceptance.py   ← durable: behavioral tests
+│       │   ├── test_contract.py     ← durable: contract conformance
+│       │   └── test_invariants.py   ← durable: invariant tests
 │       ├── fitness/
-│       │   ├── slop_score.py
-│       │   ├── complexity_check.py
-│       │   ├── duplication_check.py
-│       │   ├── dependency_check.py
-│       │   └── semantic_drift_check.py
+│       │   └── slop_score.py        ← capsule-local fitness runner
 │       └── README.md
 ├── fitness-functions/
 │   ├── README.md
-│   ├── slop_score.py
+│   ├── slop_score.py           ← aggregator
 │   ├── complexity_check.py
 │   ├── duplication_check.py
 │   ├── dependency_check.py
@@ -303,21 +308,23 @@ regenerable-architecture/
 └── LICENSE
 ```
 
+The durable / disposable distinction is structural: `intent.md`, `contracts/`, and `tests/` are preserved across regenerations; `src/` is the disposable output.
+
 ---
 
 ## Demo
 
 ```bash
-# Install dependencies
+# Install dependencies (pytest)
 make install
 
-# Run tests
+# Run the behavioral, invariant, and contract test suite
 make test
 
 # Run fitness functions against the example capsule
 make fitness
 
-# Run the full demo
+# Run tests + fitness together
 make demo
 ```
 
@@ -337,63 +344,60 @@ Expected output from `make fitness`:
 }
 ```
 
-The `test_confidence_score` of 100 reflects 43 tests covering acceptance behaviour,
-invariants, and contract conformance — strong enough to make regeneration safe.
-The high confidence completely offsets the structural scores, producing a net slop
-score of 0. This is the expected result for a freshly specified, well-tested capsule.
+The `test_confidence_score` of 100 reflects 43 tests covering acceptance behavior, invariants, and contract conformance—strong enough to make regeneration safe. High test confidence offsets the structural scores, producing a net slop score of 0. This is the expected result for a freshly specified, well-tested capsule.
 
-See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the full working example.
+See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the full working example, including the regeneration recipe and a prompt you can use with an AI coding tool to demonstrate regeneration.
 
 ---
 
 ## Related Existing Concepts
 
-Regenerable Architecture builds on established ideas. The individual ingredients are not new:
+The individual ingredients in Regenerable Architecture are established ideas with existing names and tooling. The table below shows what each contributes. The distinctive claim is not that any one of them is novel—it is that combining them for the AI-era lifecycle creates a coherent approach that none addresses on its own.
 
 | Concept | Relationship |
 |---|---|
-| Evolutionary architecture | Parent concept; RA specializes it for AI-generated code |
-| Architecture fitness functions | Directly used as slop measurement mechanism |
-| Contract-first development | Contracts are durable; RA makes them the specification source |
-| Consumer-driven contracts | Informs contract durability strategy |
-| Disposable architecture | RA formalizes the lifecycle that makes disposability safe |
-| Microservices | Capsules may be services, but do not have to be |
-| Modular monolith | Capsules work inside monoliths |
-| Code generation / scaffolding | Generation is the core cheap step in the lifecycle |
-| Event sourcing | State rebuild by replay enables capsule regeneration |
-| CQRS | Separates read/write shapes that capsules may own separately |
-| Immutable infrastructure | Same philosophy applied to code: replace, don't patch |
-| Infrastructure as code | Durable intent applied to infrastructure |
-| Data mesh / data products | Governs canonical data outside disposable capsules |
-| Property-based testing | Strong invariant tests that survive regeneration |
-| Golden-master testing | Useful for detecting behavioral drift post-regeneration |
+| Evolutionary architecture | Parent concept; RA specializes it for AI-generated code and adds regeneration as a first-class event |
+| Architecture fitness functions | Used directly as the slop measurement mechanism |
+| Contract-first development | Contracts are elevated from a design technique to a durable artifact |
+| Consumer-driven contracts | Informs why contracts must represent genuine consumer commitments |
+| Disposable architecture | RA provides the lifecycle discipline that makes disposability safe |
+| Microservices / modular monolith | Capsules can be either; the capsule boundary is conceptual, not topological |
+| Code generation / scaffolding | Generation is the cheap step; RA adds measurement and regeneration around it |
+| Event sourcing / CQRS | State-rebuild-by-replay makes capsule local state safely disposable |
+| Immutable infrastructure | Same philosophy—replace rather than patch—applied to application code |
+| Infrastructure as code | Durable intent applied to infrastructure; RA applies the same to application logic |
+| Data mesh / data products | Governs canonical data ownership outside disposable capsules |
+| Property-based testing | Invariant tests that survive regeneration unchanged |
+| Golden-master testing | Useful post-regeneration to detect behavioral drift |
 
-See [docs/novelty.md](docs/novelty.md) for a deeper treatment of the distinctions.
+See [docs/novelty.md](docs/novelty.md) for a deeper treatment of each relationship and what is genuinely new in the synthesis.
 
 ---
 
 ## Anti-Patterns
 
-See [docs/anti-patterns.md](docs/anti-patterns.md) for the full list. Key anti-patterns:
+Full descriptions in [docs/anti-patterns.md](docs/anti-patterns.md). Key failure modes:
 
-- **Distributed slop**: every capsule owns a canonical database
-- **Prompt as specification**: treating the original prompt as sufficient documentation
-- **Regeneration without tests**: deleting code without strong behavioral tests
-- **Contract drift**: implementation changes behavior without updating the contract
-- **Semantic drift**: code passes tests but no longer represents business intent
-- **Nano-service explosion**: every feature becomes a separately deployed service
+- **Distributed slop** — every capsule owns a canonical database; data conflicts become unresolvable
+- **Prompt as specification** — the original prompt is treated as sufficient documentation; regeneration fails
+- **Regeneration without tests** — deleting and rebuilding code without strong behavioral tests is just risky rewriting
+- **Contract drift** — implementation changes behavior without updating the public contract
+- **Semantic drift** — code passes tests but no longer represents business intent
+- **Nano-service explosion** — the capsule boundary is misread as a deployment boundary; operational costs multiply
+- **Fitness function theater** — metrics are measured but thresholds are never acted on
+- **Durable artifact neglect** — intent documents and recipes are created once and never updated
 
 ---
 
 ## Open Questions
 
-See [docs/open-questions.md](docs/open-questions.md). Key open questions:
+Full discussion in [docs/open-questions.md](docs/open-questions.md). Key unresolved questions:
 
 - How do you detect semantic drift reliably without LLM-assisted review?
 - What is the right granularity for a capability capsule?
-- How do fitness function thresholds evolve as systems mature?
-- How do you govern regeneration in teams with many contributors?
-- When does a disposable capsule earn the right to become a durable domain?
+- How should fitness function thresholds evolve as a team and codebase mature?
+- How do you govern regeneration decisions in teams with many contributors?
+- At what point does a disposable capsule earn the right to become a durable domain?
 
 ---
 

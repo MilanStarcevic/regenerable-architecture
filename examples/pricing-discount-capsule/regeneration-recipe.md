@@ -8,21 +8,21 @@ Use this recipe when:
 
 - The slop score for this capsule exceeds the regeneration threshold (default: 71)
 - A significant requirement change makes the current implementation a poor foundation
-- The implementation has drifted from intent and the drift is too widespread to fix by editing
+- The implementation has drifted from intent broadly enough that targeted editing is riskier than a clean start
 - The generation tooling has improved and a fresh generation would produce meaningfully better code
 
-Do not use this recipe if the durable artifacts (intent, tests, contracts) have not been reviewed and confirmed as current.
+Do not use this recipe if the durable artifacts (intent, tests, contracts) have not been reviewed and confirmed as current. Regenerating from outdated artifacts produces an implementation that satisfies outdated requirements.
 
 ## Pre-Regeneration Checklist
 
-Before running this recipe:
+Before regenerating:
 
-- [ ] `intent.md` is current and reflects the actual business intent
-- [ ] `contracts/openapi.yaml` reflects the actual public API
-- [ ] `tests/test_acceptance.py` covers all business behaviors in `intent.md`
-- [ ] `tests/test_invariants.py` covers all invariants (max cap, no negative)
-- [ ] All tests are currently passing against the old implementation
-- [ ] The slop score has been measured and recorded for comparison after regeneration
+- [ ] `intent.md` reflects the current business intent and rules
+- [ ] `contracts/openapi.yaml` reflects the current public API
+- [ ] `tests/test_acceptance.py` covers all behaviors described in `intent.md`
+- [ ] `tests/test_invariants.py` covers all invariants (max cap, no negative discount)
+- [ ] All tests pass against the current implementation
+- [ ] The slop score has been recorded for comparison after regeneration
 
 ## Source Artifacts
 
@@ -32,66 +32,58 @@ Regenerate `src/pricing_discount_service.py` from:
 2. **`contracts/openapi.yaml`** — public API contract (input/output schema)
 3. **`tests/test_acceptance.py`** — behavioral acceptance tests
 4. **`tests/test_invariants.py`** — invariant tests (must all pass)
-5. **`tests/test_contract.py`** — contract tests (must all pass)
-6. **`fitness/slop_score.py`** — slop measurement (score must stay below threshold)
+5. **`tests/test_contract.py`** — contract conformance tests (must all pass)
 
 ## Generation Rules
 
-When regenerating the implementation, follow these rules:
+1. **Preserve the public API.** The function signature `calculate_discount(customer_tier, basket_total, active_campaign)` must be preserved. The return schema must match `contracts/openapi.yaml`.
 
-1. **Preserve the public API contract.** The function signature `calculate_discount(customer_tier, basket_total, active_campaign)` must be preserved. The return schema must match `contracts/openapi.yaml`.
+2. **Preserve all business behavior.** All rules in `intent.md` must be implemented. All acceptance and invariant tests must pass.
 
-2. **Preserve all business behavior.** All rules in `intent.md` must be implemented. All acceptance tests in `test_acceptance.py` must pass.
+3. **No new external runtime dependencies.** The implementation uses only the Python standard library. Do not add `requests`, `httpx`, `pydantic`, or any other library.
 
-3. **Do not introduce external runtime dependencies.** The implementation should use only Python standard library. Do not add `requests`, `httpx`, `pydantic`, or any other library unless it was already a dependency.
+4. **Keep the implementation explicit and simple.** Prefer straightforward conditionals over rule engines, strategy patterns, or data-driven dispatch. The pricing rules are simple enough to be expressed directly. Do not add abstractions the tests do not require.
 
-4. **Keep implementation simple.** Prefer explicit, readable rule evaluation over clever abstraction. The pricing rules are simple enough to be expressed as straightforward conditionals.
+5. **All tests must pass.** `python3 -m pytest examples/pricing-discount-capsule/tests/` must complete with zero failures.
 
-5. **Prefer explicit rule evaluation.** Do not represent rules as data structures, rule engines, or strategy patterns unless the number of rules genuinely requires it. A simple function with clear conditionals is preferred.
-
-6. **All tests must pass.** `pytest examples/pricing-discount-capsule/tests/` must complete with zero failures.
-
-7. **Slop score must stay below threshold.** After regeneration, run `python fitness-functions/slop_score.py examples/pricing-discount-capsule` and verify the score is below 50.
+6. **Slop score must remain below threshold.** Run `python3 fitness-functions/slop_score.py examples/pricing-discount-capsule` and confirm the score is below 50.
 
 ## Post-Regeneration Verification
 
-After regenerating:
-
-1. Run `pytest examples/pricing-discount-capsule/tests/` — all tests must pass
-2. Run `python fitness-functions/slop_score.py examples/pricing-discount-capsule` — score must be below threshold
-3. Manually review the implementation against `intent.md` for semantic alignment
-4. Compare the output of the key test cases before and after regeneration
-5. Update the slop score history in this document if maintaining a history
+1. Run `python3 -m pytest examples/pricing-discount-capsule/tests/` — all tests must pass
+2. Run `python3 fitness-functions/slop_score.py examples/pricing-discount-capsule` — score must be below threshold
+3. Read the new implementation against `intent.md` and confirm the vocabulary matches
+4. Confirm the explanation strings in the output match the rules described in `intent.md`
 
 ## Example Prompt for AI Regeneration
 
-If using an AI coding tool, start with this prompt (adapt as needed):
+Start with this prompt when using an AI coding tool (adapt paths as needed):
 
 ```
 Regenerate src/pricing_discount_service.py for the pricing-discount-capsule.
 
-Read the following files first:
-- intent.md
-- contracts/openapi.yaml
-- tests/test_acceptance.py
-- tests/test_invariants.py
+Read these files first:
+  - intent.md
+  - contracts/openapi.yaml
+  - tests/test_acceptance.py
+  - tests/test_invariants.py
 
-Rules:
-- Function signature: calculate_discount(customer_tier: str, basket_total: float, active_campaign: bool) -> dict
-- Return: {"discount_percentage": int, "explanation": list[str]}
-- Implement all business rules from intent.md
-- Keep the implementation simple and explicit
-- No external runtime dependencies
-- All tests in tests/ must pass
+Requirements:
+  - Function signature: calculate_discount(customer_tier: str, basket_total: float, active_campaign: bool) -> dict
+  - Return: {"discount_percentage": int, "explanation": list[str]}
+  - Implement all business rules from intent.md
+  - Keep the implementation simple and explicit — no rule engines or strategy patterns
+  - No external runtime dependencies beyond the Python standard library
+  - All tests in tests/ must pass
 
-Do not add features beyond what the tests require.
+Do not add features or behavior beyond what the tests and intent.md require.
 ```
 
-## Known Good State Reference
+## Known Good State
 
-The capsule is considered in a known good state when:
+The capsule is in a known good state when:
 
 - All tests pass
 - Slop score is below 30
+- The implementation vocabulary matches `intent.md` — "discount", "tier", "basket", "campaign", "explanation", "maximum"
 - The implementation can be read and understood in under 10 minutes
-- The implementation vocabulary matches the vocabulary in `intent.md`

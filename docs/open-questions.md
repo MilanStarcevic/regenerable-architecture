@@ -1,6 +1,6 @@
 # Open Questions
 
-Regenerable Architecture is a young synthesis. These questions do not have settled answers. They are worth thinking about when applying the pattern.
+These questions do not have settled answers. They are worth working through before applying the pattern at scale, because the decisions made here determine whether the lifecycle actually functions in practice or just looks good on paper.
 
 ---
 

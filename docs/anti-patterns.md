@@ -1,5 +1,9 @@
 # Anti-Patterns in Regenerable Architecture
 
+Each of these patterns represents a way that the lifecycle breaks down: either the durable artifacts are not actually durable, the disposable layer is not actually safe to replace, or the measurement and regeneration mechanisms are present but not acted on.
+
+---
+
 ## 1. Distributed Slop
 
 **Description:** Every disposable capability capsule owns its own canonical database. As capsules proliferate, the system accumulates many small databases with duplicated domain models, inconsistent data semantics, conflicting records, and no clear ownership hierarchy.
