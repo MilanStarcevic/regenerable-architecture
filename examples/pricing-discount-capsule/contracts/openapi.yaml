@@ -1,0 +1,122 @@
+openapi: "3.1.0"
+info:
+  title: Pricing Discount Capsule API
+  version: "1.0.0"
+  description: |
+    Calculates the discount percentage for a customer basket.
+
+    This contract is a durable artifact. It must be preserved across
+    implementation regenerations. Changes to this contract require
+    updating the version and notifying consumers.
+
+paths:
+  /discount:
+    post:
+      operationId: calculateDiscount
+      summary: Calculate discount for a basket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscountRequest"
+            examples:
+              gold_customer:
+                summary: Gold customer with large basket and active campaign
+                value:
+                  customer_tier: "gold"
+                  basket_total: 600.00
+                  active_campaign: true
+              silver_customer:
+                summary: Silver customer with small basket
+                value:
+                  customer_tier: "silver"
+                  basket_total: 100.00
+                  active_campaign: false
+              unknown_tier:
+                summary: Unknown customer tier
+                value:
+                  customer_tier: "bronze"
+                  basket_total: 50.00
+                  active_campaign: false
+      responses:
+        "200":
+          description: Discount calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscountResponse"
+        "422":
+          description: Validation error (invalid input)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    DiscountRequest:
+      type: object
+      required:
+        - customer_tier
+        - basket_total
+        - active_campaign
+      properties:
+        customer_tier:
+          type: string
+          description: |
+            Customer loyalty tier. Known values: "gold", "silver".
+            Unknown tiers receive no loyalty discount.
+          example: "gold"
+        basket_total:
+          type: number
+          format: float
+          minimum: 0
+          description: Total basket value in the account currency.
+          example: 250.00
+        active_campaign:
+          type: boolean
+          description: Whether a discount campaign is currently active.
+          example: false
+
+    DiscountResponse:
+      type: object
+      required:
+        - discount_percentage
+        - explanation
+      properties:
+        discount_percentage:
+          type: integer
+          minimum: 0
+          maximum: 15
+          description: |
+            The discount percentage to apply to the basket total.
+            Always between 0 and 15 inclusive.
+            Never negative.
+          example: 15
+        explanation:
+          type: array
+          items:
+            type: string
+          description: |
+            Human-readable list of rules that contributed to the discount.
+            Required for customer-facing display, audit, and dispute resolution.
+            Empty if no discount was applied.
+          example:
+            - "Gold customer discount applied: 10%"
+            - "Large basket discount applied: 3%"
+            - "Campaign discount applied: 2%"
+            - "Maximum discount cap applied: 15%"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "validation_error"
+        message:
+          type: string
+          example: "basket_total must be non-negative"
