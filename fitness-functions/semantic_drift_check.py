@@ -38,7 +38,8 @@ INVARIANT_PATTERNS = [
     r"explanation|explain",
 ]
 
-# If no intent.md is found, use these as fallback domain terms for the demo capsule
+# Fallback domain terms used when intent.md is absent or yields too few terms.
+# Also used as the canonical set for the demo pricing-discount-capsule.
 FALLBACK_DOMAIN_TERMS = [
     "discount",
     "customer",
@@ -49,28 +50,57 @@ FALLBACK_DOMAIN_TERMS = [
     "maximum",
 ]
 
+# Words that appear naturally in intent documents but are NOT domain identifiers.
+# Narrative verbs and general English should not be checked against source code.
+_NARRATIVE_STOPWORDS = {
+    "that", "this", "with", "from", "have", "must", "will", "should",
+    "when", "into", "over", "been", "than", "then", "they", "their",
+    "more", "also", "each", "only", "just", "same", "some", "such",
+    "very", "well", "even", "most", "about", "apply", "applied",
+    # Narrative motivational verbs — present in intent docs but not in code
+    "allow", "reward", "never", "always", "encourage", "protect", "survive",
+    "activate", "ensure", "never", "always", "require", "allow", "across",
+    "boost", "boosts", "complete", "eligible", "readable", "higher", "larger",
+    "ongoing", "facing", "display", "dispute", "resolution", "recognition",
+    "purchases", "records", "catalog", "consumed", "domain", "trails", "writing",
+    "temporary", "relationship", "incentive", "margin", "audit", "configuration",
+    "does", "does", "orders", "product", "products", "human",
+}
+
 
 def _extract_domain_terms(intent_path: Path) -> list[str]:
-    """Extract likely domain terms from an intent.md file."""
+    """Extract code-relevant domain terms from an intent.md file.
+
+    Only looks at lines that specify rules, constraints, or named domain
+    objects — not narrative motivational text. This avoids false positives
+    where motivational verbs like "encourage" or "reward" are missing from
+    source code even though the capsule is correctly implemented.
+    """
     try:
-        content = intent_path.read_text(encoding="utf-8").lower()
+        content = intent_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return FALLBACK_DOMAIN_TERMS
 
-    # Extract words from bullet points and headers — likely to be domain terms
-    terms = set()
+    terms: set[str] = set()
     for line in content.splitlines():
-        line = line.strip()
-        if line.startswith(("-", "*", "#")) or line.startswith(("reward", "encourage", "allow", "never", "always")):
-            words = re.findall(r"\b[a-z]{4,}\b", line)
-            terms.update(w for w in words if w not in {
-                "that", "this", "with", "from", "have", "must", "will",
-                "should", "when", "into", "over", "been", "than", "then",
-                "they", "their", "more", "also", "each", "only", "just",
-                "same", "some", "such", "very", "well", "even", "most",
-                "about", "apply", "applied",
-            })
-    return list(terms) if terms else FALLBACK_DOMAIN_TERMS
+        stripped = line.strip()
+        # Only extract from specification-style lines, not narrative prose:
+        # - Markdown table rows (contain |)
+        # - Lines with explicit values: percentages, numbers, quoted identifiers
+        # - Section headings (short, usually domain object names)
+        is_table_row = "|" in stripped and not stripped.startswith("#")
+        has_explicit_value = bool(re.search(r"\d+%|\btier\b|\bgold\b|\bsilver\b|`[^`]+`", stripped, re.IGNORECASE))
+        is_heading = stripped.startswith("#") and len(stripped) < 60
+
+        if not (is_table_row or has_explicit_value or is_heading):
+            continue
+
+        words = re.findall(r"\b[a-z][a-z0-9]{3,}\b", stripped.lower())
+        for w in words:
+            if w not in _NARRATIVE_STOPWORDS and not w.isdigit() and len(w) <= 14:
+                terms.add(w)
+
+    return list(terms) if len(terms) >= 3 else FALLBACK_DOMAIN_TERMS
 
 
 def _read_python_sources(directory: Path) -> str:

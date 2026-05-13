@@ -26,21 +26,7 @@ def calculate_discount(
     basket_total: float,
     active_campaign: bool,
 ) -> dict:
-    """Calculate discount percentage and explanation for a basket.
-
-    Args:
-        customer_tier: Customer loyalty tier ("gold", "silver", or other).
-        basket_total: Total basket value; must be non-negative.
-        active_campaign: Whether a discount campaign is currently active.
-
-    Returns:
-        dict with keys:
-            discount_percentage (int): 0–15, never negative.
-            explanation (list[str]): Applied rules in order.
-
-    Raises:
-        ValueError: If basket_total is negative.
-    """
+    """Return discount_percentage (0-15) and explanation list for a basket."""
     if basket_total < 0:
         raise ValueError("basket_total must be non-negative")
 

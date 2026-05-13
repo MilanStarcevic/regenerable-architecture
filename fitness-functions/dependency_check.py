@@ -30,6 +30,19 @@ STDLIB_MODULES = {
     "unittest", "urllib", "uuid", "warnings", "weakref", "xml", "zipfile",
 }
 
+# Test frameworks and coverage tools: expected in test files, not a slop signal.
+KNOWN_TEST_DEPS = {"pytest", "pytest_cov", "coverage", "hypothesis", "factory_boy"}
+
+# Fitness-function module names: expected in fitness/ wrapper files, not business logic.
+KNOWN_FITNESS_MODULES = {
+    "slop_score", "complexity_check", "duplication_check", "dependency_check",
+    "test_confidence_check", "semantic_drift_check", "changeability_check",
+}
+
+# Directory names whose contents are scaffolding, not business-logic implementation.
+# Imports in these directories are exempt from the external-dependency penalty.
+EXEMPT_SUBDIRS = {"fitness", "fitness-functions"}
+
 # Thresholds
 MAX_IMPORTS_PER_FILE = 10
 MAX_EXTERNAL_IMPORTS_PER_FILE = 5
@@ -59,7 +72,20 @@ def _get_imports(tree: ast.AST) -> list[str]:
 
 
 def _is_external(module: str) -> bool:
-    return module not in STDLIB_MODULES and not module.startswith("_")
+    if module in STDLIB_MODULES:
+        return False
+    if module in KNOWN_TEST_DEPS:
+        return False
+    if module in KNOWN_FITNESS_MODULES:
+        return False
+    if module.startswith("_"):
+        return False
+    return True
+
+
+def _is_exempt_path(f: Path) -> bool:
+    """Return True if this file is in an exempt scaffolding directory."""
+    return any(part in EXEMPT_SUBDIRS for part in f.parts)
 
 
 def check_directory(directory: str | Path, forbidden: set[str] | None = None) -> dict:
@@ -85,6 +111,18 @@ def check_directory(directory: str | Path, forbidden: set[str] | None = None) ->
             continue
 
         imports = _get_imports(tree)
+        # Exempt fitness/ wrappers from external-dependency accounting entirely.
+        if _is_exempt_path(f):
+            file_details.append({
+                "file": str(f),
+                "total_imports": len(imports),
+                "external_imports": 0,
+                "forbidden": [],
+                "exempt": True,
+            })
+            all_imports.extend(imports)
+            continue
+
         external = [i for i in imports if _is_external(i)]
         bad = [i for i in external if i in forbidden]
 

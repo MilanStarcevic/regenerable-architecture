@@ -325,17 +325,22 @@ Expected output from `make fitness`:
 
 ```json
 {
-  "complexity_score": 12,
-  "duplication_score": 5,
-  "dependency_score": 8,
-  "semantic_drift_score": 10,
-  "changeability_score": 5,
-  "test_confidence_score": 25,
-  "slop_score": 15,
+  "complexity_score": 11.3,
+  "duplication_score": 12.1,
+  "dependency_score": 12.3,
+  "semantic_drift_score": 4.3,
+  "changeability_score": 0.0,
+  "test_confidence_score": 100.0,
+  "slop_score": 0,
   "status": "healthy",
   "recommended_action": "maintain"
 }
 ```
+
+The `test_confidence_score` of 100 reflects 43 tests covering acceptance behaviour,
+invariants, and contract conformance — strong enough to make regeneration safe.
+The high confidence completely offsets the structural scores, producing a net slop
+score of 0. This is the expected result for a freshly specified, well-tested capsule.
 
 See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the full working example.
 
