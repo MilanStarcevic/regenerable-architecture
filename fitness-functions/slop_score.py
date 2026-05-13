@@ -117,7 +117,7 @@ def compute_slop_score(directory: str | Path, verbose: bool = False) -> dict:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(f"Usage: python {sys.argv[0]} <capsule-directory> [--verbose]", file=sys.stderr)
+        print(f"Usage: python3 {sys.argv[0]} <capsule-directory> [--verbose]", file=sys.stderr)
         sys.exit(2)
 
     target = sys.argv[1]

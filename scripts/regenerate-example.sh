@@ -47,12 +47,12 @@ echo "  Implementation regenerated."
 
 echo ""
 echo "Step 4: Run tests to verify correctness"
-python -m pytest "$CAPSULE/tests/" -q --tb=short
+python3 -m pytest "$CAPSULE/tests/" -q --tb=short
 echo "  All tests passed."
 
 echo ""
 echo "Step 5: Run fitness functions to verify health"
-python "$REPO_ROOT/fitness-functions/slop_score.py" "$CAPSULE"
+python3 "$REPO_ROOT/fitness-functions/slop_score.py" "$CAPSULE"
 
 echo ""
 echo "=== Regeneration complete ==="

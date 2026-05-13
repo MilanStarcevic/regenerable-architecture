@@ -2,8 +2,6 @@
 
 > **Durable intent, disposable implementation.**
 
-## One-Sentence Definition
-
 **Regenerable Architecture** preserves intent, contracts, tests, data semantics, and operational expectations as durable artifacts—and treats implementation code, especially AI-generated code, as disposable. When implementation quality decays past a measurable threshold, it is discarded and regenerated from those preserved artifacts rather than refactored in place.
 
 The individual ingredients are established: evolutionary architecture, fitness functions, contract-first design, disposable infrastructure, code generation. The synthesis is the AI-era lifecycle that ties them together: *specify → generate → operate → measure slop → regenerate*.
