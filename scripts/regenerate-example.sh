@@ -52,7 +52,7 @@ echo "  All tests passed."
 
 echo ""
 echo "Step 5: Run fitness functions to verify health"
-python3 "$REPO_ROOT/fitness-functions/slop_score.py" "$CAPSULE"
+python3 "$CAPSULE/fitness/slop_score.py"
 
 echo ""
 echo "=== Regeneration complete ==="

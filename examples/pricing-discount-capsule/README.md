@@ -14,7 +14,7 @@ This capsule calculates the discount percentage for a customer basket. It is int
 | `tests/test_acceptance.py` | **Durable** | Behavioral tests against the public API |
 | `tests/test_invariants.py` | **Durable** | Invariants that must hold for all inputs |
 | `tests/test_contract.py` | **Durable** | Contract conformance tests |
-| `fitness/slop_score.py` | **Durable** | Capsule-local fitness runner |
+| `fitness/` | **Durable** | Reference Python implementation of the fitness function interface |
 | `src/pricing_discount_service.py` | **Disposable** | Generated implementation |
 
 The durable layer survives regeneration. The disposable layer does not need to.
@@ -43,11 +43,21 @@ Expected result: 43 tests pass across acceptance, invariant, and contract test s
 
 ## Running the Fitness Functions
 
+From the repository root:
+
 ```bash
-python3 fitness-functions/slop_score.py examples/pricing-discount-capsule
+python3 examples/pricing-discount-capsule/fitness/slop_score.py
+```
+
+Or via Make:
+
+```bash
+make fitness
 ```
 
 Expected result: slop score of 0 (healthy), with `test_confidence_score` of 100 reflecting the comprehensive test coverage.
+
+The fitness implementation is Python-specific. See [fitness-functions/README.md](../../fitness-functions/README.md) for the language-agnostic interface specification and tool alternatives for other stacks.
 
 ## Example Output
 

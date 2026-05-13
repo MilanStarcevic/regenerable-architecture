@@ -1,22 +1,13 @@
 """
-Changeability Check Fitness Function
+Changeability Check — reference implementation.
+See fitness-functions/README.md for the interface contract and tool alternatives.
 
-Measures implementation stability and change history.
-
-High churn may indicate either healthy evolution or implementation thrashing.
-TODO/FIXME/HACK comments are signals that the implementation has known issues
-that were deferred rather than resolved.
-
-Metrics:
-  - TODO/FIXME/HACK comment count
-  - Recent git churn (files changed in last N commits, if git history exists)
-  - Unstable file count (files touched more than once in recent history)
-
+Measures implementation stability via git churn and deferred-problem markers.
 Returns a score from 0 (stable) to 100 (high changeability / thrashing risk).
-If git history is not available, returns a neutral score with an explanation.
 """
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -26,10 +17,15 @@ TODO_PATTERN = re.compile(r"\b(TODO|FIXME|HACK|XXX|NOQA|TEMP)\b", re.IGNORECASE)
 GIT_LOG_DEPTH = 20
 
 
+_SKIP = {"fitness", "fitness-functions"}
+
+
 def _count_todos(directory: Path) -> int:
     total = 0
     for f in directory.rglob("*.py"):
         if any(part.startswith(".") for part in f.parts):
+            continue
+        if any(part in _SKIP for part in f.parts):
             continue
         try:
             source = f.read_text(encoding="utf-8")
@@ -40,10 +36,10 @@ def _count_todos(directory: Path) -> int:
 
 
 def _git_churn(directory: Path, depth: int = GIT_LOG_DEPTH) -> tuple[list[str], bool]:
-    """Returns (list of changed files in last N commits, git_available)."""
     try:
         result = subprocess.run(
-            ["git", "log", f"-{depth}", "--name-only", "--pretty=format:", "--", str(directory)],
+            ["git", "log", f"-{depth}", "--name-only", "--pretty=format:", "--",
+             str(directory / "src"), str(directory / "tests")],
             capture_output=True,
             text=True,
             timeout=10,
@@ -75,9 +71,8 @@ def check_directory(directory: str | Path) -> dict:
         score += churn_score + unstable_score
     else:
         git_note = "git history not available; churn metrics skipped"
-        score += 10  # neutral penalty for missing history
+        score += 10
 
-    # TODO/FIXME penalty (up to 30)
     score += min(30, todo_count * 5)
 
     return {
@@ -90,9 +85,7 @@ def check_directory(directory: str | Path) -> dict:
 
 
 if __name__ == "__main__":
-    import json
-
-    target = sys.argv[1] if len(sys.argv) > 1 else "."
+    target = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).parent.parent)
     result = check_directory(target)
     print(json.dumps(result, indent=2))
     if result["score"] > 70:

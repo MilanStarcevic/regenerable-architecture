@@ -191,7 +191,7 @@ Normalized to 0–100. Test confidence is subtracted because strong tests reduce
 
 Thresholds are configurable. A team with comprehensive test coverage may tolerate higher complexity; a regulated-domain team may want stricter thresholds on semantic drift.
 
-See [fitness-functions/](fitness-functions/) for working implementations.
+See [fitness-functions/](fitness-functions/) for the signal specification, interface contract, and tool alternatives (SonarQube, ESLint, Roslyn analyzers, and others). The reference Python implementation is in [examples/pricing-discount-capsule/fitness/](examples/pricing-discount-capsule/fitness/).
 
 ---
 
@@ -287,17 +287,16 @@ regenerable-architecture/
 │       │   ├── test_contract.py     ← durable: contract conformance
 │       │   └── test_invariants.py   ← durable: invariant tests
 │       ├── fitness/
-│       │   └── slop_score.py        ← capsule-local fitness runner
+│       │   ├── slop_score.py        ← durable: reference fitness runner
+│       │   ├── complexity_check.py  ← durable: reference implementation
+│       │   ├── duplication_check.py
+│       │   ├── dependency_check.py
+│       │   ├── test_confidence_check.py
+│       │   ├── semantic_drift_check.py
+│       │   └── changeability_check.py
 │       └── README.md
 ├── fitness-functions/
-│   ├── README.md
-│   ├── slop_score.py           ← aggregator
-│   ├── complexity_check.py
-│   ├── duplication_check.py
-│   ├── dependency_check.py
-│   ├── test_confidence_check.py
-│   ├── changeability_check.py
-│   └── semantic_drift_check.py
+│   └── README.md                ← signal spec and tool alternatives (language-agnostic)
 ├── scripts/
 │   ├── run-fitness.sh
 │   └── regenerate-example.sh
@@ -330,11 +329,11 @@ Expected output from `make fitness`:
 
 ```json
 {
-  "complexity_score": 11.3,
-  "duplication_score": 12.1,
-  "dependency_score": 12.3,
+  "complexity_score": 14.1,
+  "duplication_score": 9.9,
+  "dependency_score": 16.0,
   "semantic_drift_score": 4.3,
-  "changeability_score": 0.0,
+  "changeability_score": 11.0,
   "test_confidence_score": 100.0,
   "slop_score": 0,
   "status": "healthy",

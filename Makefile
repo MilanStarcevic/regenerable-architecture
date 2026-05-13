@@ -7,7 +7,7 @@ test:
 	python3 -m pytest examples/pricing-discount-capsule/tests/ -v
 
 fitness:
-	python3 fitness-functions/slop_score.py examples/pricing-discount-capsule
+	python3 examples/pricing-discount-capsule/fitness/slop_score.py
 
 demo:
 	@echo "=== Regenerable Architecture Demo ==="

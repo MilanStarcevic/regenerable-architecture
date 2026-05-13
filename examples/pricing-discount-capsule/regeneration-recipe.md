@@ -46,12 +46,12 @@ Regenerate `src/pricing_discount_service.py` from:
 
 5. **All tests must pass.** `python3 -m pytest examples/pricing-discount-capsule/tests/` must complete with zero failures.
 
-6. **Slop score must remain below threshold.** Run `python3 fitness-functions/slop_score.py examples/pricing-discount-capsule` and confirm the score is below 50.
+6. **Slop score must remain below threshold.** Run `python3 fitness/slop_score.py` and confirm the score is below 50.
 
 ## Post-Regeneration Verification
 
 1. Run `python3 -m pytest examples/pricing-discount-capsule/tests/` — all tests must pass
-2. Run `python3 fitness-functions/slop_score.py examples/pricing-discount-capsule` — score must be below threshold
+2. Run `python3 fitness/slop_score.py` — score must be below threshold
 3. Read the new implementation against `intent.md` and confirm the vocabulary matches
 4. Confirm the explanation strings in the output match the rules described in `intent.md`
 

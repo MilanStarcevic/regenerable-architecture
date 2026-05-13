@@ -1,27 +1,17 @@
 """
-Test Confidence Check Fitness Function
+Test Confidence Check — reference implementation.
+See fitness-functions/README.md for the interface contract and tool alternatives.
 
-Measures the quality of the test suite as a guide for safe regeneration.
-
-High test confidence reduces slop risk. Low test confidence means regeneration
-is dangerous — the regenerated implementation may diverge from business intent
-without being caught.
-
-Metrics:
-  - Total test count
-  - Presence of acceptance tests
-  - Presence of invariant/property-style tests
-  - Whether tests pass (via subprocess pytest call)
-
-Returns a score from 0 (no test confidence) to 100 (high confidence).
+Measures test suite quality as a guide for safe regeneration.
+Returns a score from 0 (no confidence) to 100 (high confidence).
 Higher is better — this score is SUBTRACTED from the slop total.
 """
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
-
 
 MIN_TESTS_FOR_CONFIDENCE = 5
 ACCEPTANCE_TEST_PATTERNS = ["test_acceptance", "acceptance"]
@@ -55,7 +45,6 @@ def _count_test_functions(directory: Path) -> tuple[int, bool, bool]:
 
 
 def _run_tests(directory: Path) -> tuple[bool, str]:
-    """Run pytest and return (passed, output)."""
     try:
         result = subprocess.run(
             [sys.executable, "-m", "pytest", str(directory), "-q", "--tb=no"],
@@ -73,7 +62,6 @@ def _run_tests(directory: Path) -> tuple[bool, str]:
 def check_directory(directory: str | Path, run_tests: bool = True) -> dict:
     directory = Path(directory)
 
-    # Find tests/ subdirectory if it exists
     test_dirs = list(directory.rglob("tests"))
     test_search = test_dirs[0] if test_dirs else directory
 
@@ -84,25 +72,20 @@ def check_directory(directory: str | Path, run_tests: bool = True) -> dict:
     if run_tests:
         tests_passed, test_output = _run_tests(test_search)
 
-    # Score calculation (higher = more confident = REDUCES slop score)
     score = 0.0
 
-    # Test count contribution (up to 40 points)
     score += min(40, (total_tests / max(MIN_TESTS_FOR_CONFIDENCE, 1)) * 20)
 
-    # Acceptance tests (20 points)
     if has_acceptance:
         score += 20
 
-    # Invariant tests (20 points)
     if has_invariants:
         score += 20
 
-    # Tests passing (20 points)
     if tests_passed is True:
         score += 20
     elif tests_passed is False:
-        score -= 10  # Failing tests reduce confidence
+        score -= 10
 
     return {
         "total_tests": total_tests,
@@ -115,8 +98,6 @@ def check_directory(directory: str | Path, run_tests: bool = True) -> dict:
 
 
 if __name__ == "__main__":
-    import json
-
-    target = sys.argv[1] if len(sys.argv) > 1 else "."
+    target = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).parent.parent)
     result = check_directory(target)
     print(json.dumps(result, indent=2))
