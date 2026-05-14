@@ -18,7 +18,7 @@ Do not use this recipe if the durable artifacts (intent, tests, contracts) have 
 Before regenerating:
 
 - [ ] `intent.md` reflects the current business intent and rules
-- [ ] `contracts/openapi.yaml` reflects the current public API
+- [ ] `ports/inbound/openapi.yaml` reflects the current public API
 - [ ] `tests/test_acceptance.py` covers all behaviors described in `intent.md`
 - [ ] `tests/test_invariants.py` covers all invariants (max cap, no negative discount)
 - [ ] All tests pass against the current implementation
@@ -29,14 +29,15 @@ Before regenerating:
 Regenerate `src/pricing_discount_service.py` from:
 
 1. **`intent.md`** — business intent and durable rules
-2. **`contracts/openapi.yaml`** — public API contract (input/output schema)
-3. **`tests/test_acceptance.py`** — behavioral acceptance tests
-4. **`tests/test_invariants.py`** — invariant tests (must all pass)
-5. **`tests/test_contract.py`** — contract conformance tests (must all pass)
+2. **`ports/inbound/openapi.yaml`** — public API contract (input/output schema)
+3. **`ports/outbound/dependencies.yaml`** — outbound dependencies (none for this capsule)
+4. **`tests/test_acceptance.py`** — behavioral acceptance tests
+5. **`tests/test_invariants.py`** — invariant tests (must all pass)
+6. **`tests/test_contract.py`** — contract conformance tests (must all pass)
 
 ## Generation Rules
 
-1. **Preserve the public API.** The function signature `calculate_discount(customer_tier, basket_total, active_campaign)` must be preserved. The return schema must match `contracts/openapi.yaml`.
+1. **Preserve the public API.** The function signature `calculate_discount(customer_tier, basket_total, active_campaign)` must be preserved. The return schema must match `ports/inbound/openapi.yaml`.
 
 2. **Preserve all business behavior.** All rules in `intent.md` must be implemented. All acceptance and invariant tests must pass.
 
@@ -64,7 +65,8 @@ Regenerate src/pricing_discount_service.py for the pricing-discount-capsule.
 
 Read these files first:
   - intent.md
-  - contracts/openapi.yaml
+  - ports/inbound/openapi.yaml
+  - ports/outbound/dependencies.yaml
   - tests/test_acceptance.py
   - tests/test_invariants.py
 

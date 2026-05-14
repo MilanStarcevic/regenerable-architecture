@@ -1,0 +1,10 @@
+# ports/outbound/dependencies.yaml
+#
+# Declares what this capsule consumes from other capsules or external services.
+# This is a DURABLE artifact. Changes here mean the integration surface has
+# changed; downstream verification must be re-run.
+#
+# The pricing-discount-capsule is a leaf node: it calculates discounts from
+# inputs alone and depends on nothing external.
+
+dependencies: []

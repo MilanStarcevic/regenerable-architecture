@@ -6,7 +6,8 @@ It may be regenerated when the slop score exceeds the configured threshold.
 
 Durable artifacts that govern this implementation:
   - ../intent.md
-  - ../contracts/openapi.yaml
+  - ../ports/inbound/openapi.yaml
+  - ../ports/outbound/dependencies.yaml
   - ../tests/test_acceptance.py
   - ../tests/test_invariants.py
   - ../regeneration-recipe.md

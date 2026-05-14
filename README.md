@@ -86,13 +86,16 @@ flowchart TB
 | Artifact | Why Durable |
 |---|---|
 | `intent.md` | The business reason the capsule exists; survives every regeneration |
-| OpenAPI / AsyncAPI contracts | The public commitment to callers; callers depend on this |
+| Inbound contracts (`ports/inbound/`) | The public commitment to callers; callers depend on this |
+| Outbound dependencies (`ports/outbound/`) | What this capsule consumes; constrains the regenerated implementation |
 | Acceptance tests | Behavioral proof of what the system must do, independent of implementation |
 | Invariant / property tests | Rules that must hold for all inputs, regardless of how the code is structured |
+| Integration tests | Verify the outbound adapter against the real dependency after each regeneration |
 | Data semantics | What each field means, who owns it, how it relates to the domain |
 | Operational SLOs | Latency, error rate, and throughput expectations |
 | Regeneration recipe | Step-by-step instructions for recreating the implementation correctly |
 | Fitness function thresholds | The team's definition of "healthy"—set in advance, not rationalized after the fact |
+| System manifest (`system.yaml`) | Dependency graph across all capsules; enables safe regeneration sequencing |
 
 ### Disposable (safe to discard and recreate)
 
@@ -117,15 +120,17 @@ It bundles everything needed to specify, generate, operate, and regenerate a sin
 flowchart TB
     subgraph Capsule["Capability Capsule"]
         Intent[intent.md]
-        Contract[openapi.yaml / asyncapi.yaml]
-        Tests[Acceptance and Contract Tests]
+        InboundPort[ports/inbound — what it provides]
+        OutboundPort[ports/outbound — what it consumes]
+        Tests[Acceptance, Invariant, Contract, Integration Tests]
         Fitness[Fitness Functions]
         Recipe[regeneration-recipe.md]
         Implementation[Generated Implementation]
     end
 
     Intent --> Implementation
-    Contract --> Implementation
+    InboundPort --> Implementation
+    OutboundPort --> Implementation
     Tests --> Implementation
     Fitness --> Implementation
     Recipe --> Implementation
@@ -267,6 +272,7 @@ See [docs/data-strategies.md](docs/data-strategies.md) for the full treatment in
 ```
 regenerable-architecture/
 ├── README.md
+├── system.yaml                  ← durable: capsule dependency graph
 ├── docs/
 │   ├── concept.md           ← in-depth explanation of the architecture
 │   ├── novelty.md           ← what is new, what is borrowed
@@ -275,25 +281,45 @@ regenerable-architecture/
 │   ├── anti-patterns.md     ← failure modes and how to avoid them
 │   └── open-questions.md    ← unresolved questions
 ├── examples/
-│   └── pricing-discount-capsule/
+│   ├── pricing-discount-capsule/    ← leaf capsule: no outbound dependencies
+│   │   ├── intent.md                ← durable: business intent
+│   │   ├── regeneration-recipe.md   ← durable: how to regenerate
+│   │   ├── ports/
+│   │   │   ├── inbound/
+│   │   │   │   └── openapi.yaml     ← durable: public API contract
+│   │   │   └── outbound/
+│   │   │       └── dependencies.yaml ← durable: outbound deps (empty)
+│   │   ├── src/
+│   │   │   └── pricing_discount_service.py  ← disposable: implementation
+│   │   ├── tests/
+│   │   │   ├── test_acceptance.py   ← durable: behavioral tests
+│   │   │   ├── test_contract.py     ← durable: contract conformance
+│   │   │   └── test_invariants.py   ← durable: invariant tests
+│   │   ├── fitness/
+│   │   │   ├── slop_score.py        ← durable: reference fitness runner
+│   │   │   ├── complexity_check.py  ← durable: reference implementation
+│   │   │   ├── duplication_check.py
+│   │   │   ├── dependency_check.py
+│   │   │   ├── test_confidence_check.py
+│   │   │   ├── semantic_drift_check.py
+│   │   │   └── changeability_check.py
+│   │   └── README.md
+│   └── order-capsule/               ← dependent capsule: consumes pricing-discount-capsule
 │       ├── intent.md                ← durable: business intent
 │       ├── regeneration-recipe.md   ← durable: how to regenerate
-│       ├── contracts/
-│       │   └── openapi.yaml         ← durable: public API contract
+│       ├── ports/
+│       │   ├── inbound/
+│       │   │   └── openapi.yaml     ← durable: public API contract
+│       │   └── outbound/
+│       │       └── dependencies.yaml ← durable: declares pricing-discount-capsule dependency
 │       ├── src/
-│       │   └── pricing_discount_service.py  ← disposable: implementation
+│       │   └── order_service.py     ← disposable: implementation
 │       ├── tests/
-│       │   ├── test_acceptance.py   ← durable: behavioral tests
+│       │   ├── test_acceptance.py   ← durable: behavioral tests (stub discount service)
 │       │   ├── test_contract.py     ← durable: contract conformance
-│       │   └── test_invariants.py   ← durable: invariant tests
+│       │   ├── test_invariants.py   ← durable: invariant tests
+│       │   └── test_integration.py  ← durable: outbound adapter against real capsule
 │       ├── fitness/
-│       │   ├── slop_score.py        ← durable: reference fitness runner
-│       │   ├── complexity_check.py  ← durable: reference implementation
-│       │   ├── duplication_check.py
-│       │   ├── dependency_check.py
-│       │   ├── test_confidence_check.py
-│       │   ├── semantic_drift_check.py
-│       │   └── changeability_check.py
 │       └── README.md
 ├── fitness-functions/
 │   └── README.md                ← signal spec and tool alternatives (language-agnostic)
@@ -305,7 +331,7 @@ regenerable-architecture/
 └── LICENSE
 ```
 
-The durable / disposable distinction is structural: `intent.md`, `contracts/`, and `tests/` are preserved across regenerations; `src/` is the disposable output.
+The durable / disposable distinction is structural: `intent.md`, `ports/`, `tests/`, and `fitness/` are preserved across regenerations; `src/` is the disposable output. The `system.yaml` at the root preserves the dependency graph across all capsules.
 
 ---
 
@@ -343,7 +369,7 @@ Expected output from `make fitness`:
 
 The `test_confidence_score` of 100 reflects 43 tests covering acceptance behavior, invariants, and contract conformance—strong enough to make regeneration safe. High test confidence offsets the structural scores, producing a net slop score of 0. This is the expected result for a freshly specified, well-tested capsule.
 
-See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the full working example, including the regeneration recipe and a prompt you can use with an AI coding tool to demonstrate regeneration.
+See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the leaf capsule example, and [examples/order-capsule/](examples/order-capsule/) for a dependent capsule that consumes it via a declared outbound port. The `system.yaml` at the repository root shows the dependency graph across both.
 
 ---
 
@@ -356,7 +382,8 @@ The individual ingredients in Regenerable Architecture are established ideas wit
 | Evolutionary architecture | Parent concept; RA specializes it for AI-generated code and adds regeneration as a first-class event |
 | Architecture fitness functions | Used directly as the slop measurement mechanism |
 | Contract-first development | Contracts are elevated from a design technique to a durable artifact |
-| Consumer-driven contracts | Informs why contracts must represent genuine consumer commitments |
+| Consumer-driven contracts | Informs why outbound port declarations must represent genuine consumer commitments |
+| Hexagonal architecture (ports and adapters) | Inbound/outbound port structure maps directly; adapters are disposable, ports are durable |
 | Disposable architecture | RA provides the lifecycle discipline that makes disposability safe |
 | Microservices / modular monolith | Capsules can be either; the capsule boundary is conceptual, not topological |
 | Code generation / scaffolding | Generation is the cheap step; RA adds measurement and regeneration around it |

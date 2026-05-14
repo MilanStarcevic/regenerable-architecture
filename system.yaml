@@ -1,0 +1,45 @@
+# system.yaml
+#
+# System manifest for the regenerable-architecture example system.
+#
+# This is a DURABLE system-level artifact. It declares all capsules and their
+# dependency relationships. Update it when capsules are added, removed, or when
+# dependency relationships change.
+#
+# The manifest enables:
+#   - Dependency graph visibility across capsules
+#   - Impact analysis before a capsule is regenerated
+#   - Safe regeneration sequencing (dependencies before dependents)
+#   - Contract compatibility checks across capsule versions
+
+capsules:
+
+  - name: pricing-discount-capsule
+    path: examples/pricing-discount-capsule
+    provides: Calculates discount percentage and explanation for a customer basket
+    inbound_contract: ports/inbound/openapi.yaml
+    inbound_version: "1.0"
+    depends_on: []
+
+  - name: order-capsule
+    path: examples/order-capsule
+    provides: Places and retrieves customer orders with discount applied
+    inbound_contract: ports/inbound/openapi.yaml
+    inbound_version: "1.0"
+    depends_on:
+      - capsule: pricing-discount-capsule
+        contract: ports/inbound/openapi.yaml
+        version: "1.0"
+        operations:
+          - calculateDiscount
+        why: Determines the discount percentage and explanation before recording an order
+
+# Regeneration pre-flight protocol:
+#
+# Before regenerating any capsule:
+#   1. Identify all capsules in depends_on that list this capsule.
+#      Those consumers must re-run test_integration.py after the regeneration.
+#   2. Verify the regenerated inbound_contract is compatible with every
+#      consumer's declared version.
+#   3. If multiple capsules need regeneration, regenerate dependencies first
+#      (capsules with empty depends_on), then dependents.

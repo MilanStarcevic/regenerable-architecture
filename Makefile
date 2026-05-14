@@ -4,18 +4,22 @@ install:
 	pip3 install pytest pytest-cov
 
 test:
-	python3 -m pytest examples/pricing-discount-capsule/tests/ -v
+	python3 -m pytest examples/ -v
 
 fitness:
+	@echo "--- pricing-discount-capsule ---"
 	python3 examples/pricing-discount-capsule/fitness/slop_score.py
+	@echo ""
+	@echo "--- order-capsule ---"
+	python3 examples/order-capsule/fitness/slop_score.py
 
 demo:
 	@echo "=== Regenerable Architecture Demo ==="
 	@echo ""
-	@echo "--- Running tests ---"
+	@echo "--- Running tests (all capsules) ---"
 	$(MAKE) test
 	@echo ""
-	@echo "--- Running fitness functions ---"
+	@echo "--- Running fitness functions (all capsules) ---"
 	$(MAKE) fitness
 	@echo ""
 	@echo "=== Demo complete ==="

@@ -10,7 +10,8 @@ This capsule calculates the discount percentage for a customer basket. It is int
 |---|---|---|
 | `intent.md` | **Durable** | Business intent and rules—the source of truth |
 | `regeneration-recipe.md` | **Durable** | Step-by-step instructions for regenerating the implementation |
-| `contracts/openapi.yaml` | **Durable** | Public API contract; callers depend on this |
+| `ports/inbound/openapi.yaml` | **Durable** | Public API contract; callers depend on this |
+| `ports/outbound/dependencies.yaml` | **Durable** | Outbound dependencies declared (none for this capsule) |
 | `tests/test_acceptance.py` | **Durable** | Behavioral tests against the public API |
 | `tests/test_invariants.py` | **Durable** | Invariants that must hold for all inputs |
 | `tests/test_contract.py` | **Durable** | Contract conformance tests |
@@ -90,7 +91,8 @@ print(result)
 If you deleted `src/pricing_discount_service.py` right now and followed the regeneration recipe, the regenerated implementation would pass all 43 tests. The durable artifacts contain everything needed to produce a correct implementation:
 
 - The business rules are in `intent.md`
-- The API shape is in `contracts/openapi.yaml`
+- The API shape is in `ports/inbound/openapi.yaml`
+- The outbound dependencies are in `ports/outbound/dependencies.yaml` (none for this capsule)
 - The behavioral requirements are in `tests/test_acceptance.py`
 - The invariants are in `tests/test_invariants.py`
 - The generation instructions are in `regeneration-recipe.md`

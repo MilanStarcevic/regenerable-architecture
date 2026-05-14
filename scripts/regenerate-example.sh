@@ -19,7 +19,7 @@ echo "=== Regeneration Demo: pricing-discount-capsule ==="
 echo ""
 
 echo "Step 1: Verify durable artifacts are in place"
-for f in "intent.md" "regeneration-recipe.md" "contracts/openapi.yaml" \
+for f in "intent.md" "regeneration-recipe.md" "ports/inbound/openapi.yaml" \
           "tests/test_acceptance.py" "tests/test_invariants.py" "tests/test_contract.py"; do
     if [ -f "$CAPSULE/$f" ]; then
         echo "  [ok] $f"
@@ -42,7 +42,8 @@ claude -p "Regenerate $IMPL for the pricing-discount-capsule.
 
 Read these files first:
   - $CAPSULE/intent.md
-  - $CAPSULE/contracts/openapi.yaml
+  - $CAPSULE/ports/inbound/openapi.yaml
+  - $CAPSULE/ports/outbound/dependencies.yaml
   - $CAPSULE/tests/test_acceptance.py
   - $CAPSULE/tests/test_invariants.py
 

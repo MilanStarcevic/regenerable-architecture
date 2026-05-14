@@ -1,0 +1,36 @@
+# ports/outbound/dependencies.yaml
+#
+# Declares what this capsule consumes from other capsules or external services.
+# This is a DURABLE artifact. Changes here mean the integration surface has
+# changed; integration tests must be re-run against the real dependency.
+#
+# When regenerating the order-capsule implementation, the new code must satisfy
+# these outbound contracts exactly — the operations called, the inputs passed,
+# and the response fields consumed must match what is declared here.
+
+dependencies:
+  - capsule: pricing-discount-capsule
+    version: "1.0"
+    contract: ../pricing-discount-capsule/ports/inbound/openapi.yaml
+    operations:
+      - operationId: calculateDiscount
+        why: Determines the discount percentage and explanation for the customer's basket.
+        inputs:
+          - customer_tier: string   # forwarded from the order request
+          - basket_total: float     # forwarded from the order request
+          - active_campaign: bool   # forwarded from the order request
+        consumed_outputs:
+          - discount_percentage: integer  # applied to compute final_total
+          - explanation: list[string]     # stored verbatim on the order record
+
+    # Representative stub behaviours for use in unit tests.
+    # These examples must remain consistent with the pricing-discount-capsule contract.
+    stub_behaviours:
+      - input: { customer_tier: "gold", basket_total: 100.0, active_campaign: false }
+        output: { discount_percentage: 10, explanation: ["Gold customer discount applied: 10%"] }
+      - input: { customer_tier: "silver", basket_total: 100.0, active_campaign: false }
+        output: { discount_percentage: 5, explanation: ["Silver customer discount applied: 5%"] }
+      - input: { customer_tier: "bronze", basket_total: 50.0, active_campaign: false }
+        output: { discount_percentage: 0, explanation: [] }
+      - input: { customer_tier: "gold", basket_total: 600.0, active_campaign: true }
+        output: { discount_percentage: 15, explanation: ["Gold customer discount applied: 10%", "Large basket discount applied: 3%", "Campaign discount applied: 2%", "Maximum discount cap applied: 15%"] }

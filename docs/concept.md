@@ -62,6 +62,92 @@ Each phase has a clear purpose:
 
 **Regenerate**: When the slop score crosses the threshold, discard the implementation and regenerate from the preserved durable artifacts. Verify that all tests pass and the fitness score returns to healthy.
 
+## Ports: Inbound and Outbound Contracts
+
+Every capsule has two contract surfaces, both durable:
+
+**Inbound port** — what the capsule provides. The public API contract (`ports/inbound/openapi.yaml`) that callers depend on. This is the commitment the capsule makes to the outside world. It must be preserved across regenerations, and changes to it require versioning and consumer notification.
+
+**Outbound port** — what the capsule consumes. A declaration (`ports/outbound/dependencies.yaml`) of which other capsules this capsule calls, which operations it uses, and which response fields it reads. This is equally durable: when the implementation is regenerated, the new code must satisfy the same outbound contracts. The declaration also provides stub behaviours for unit tests, keeping acceptance tests isolated from real dependencies.
+
+This maps directly onto hexagonal architecture (ports and adapters):
+
+| Hexagonal concept | Regenerable equivalent | Durability |
+|---|---|---|
+| Inbound port | `ports/inbound/openapi.yaml` | Durable |
+| Outbound port | `ports/outbound/dependencies.yaml` | Durable |
+| Inbound adapter | Framework glue receiving the call | Disposable |
+| Outbound adapter | Client code calling another capsule | Disposable |
+| Core / domain logic | Business implementation | Disposable |
+
+The key move is treating outbound dependencies as durable artifacts. A regenerated implementation that quietly starts calling a different service, or consuming different response fields, has changed the system's integration surface without declaring it. The outbound port declaration prevents this: it constrains what the implementation may call and how, and gives integration tests a clear specification to verify against.
+
+### Extended Capsule Structure
+
+```
+capsule/
+├── intent.md
+├── regeneration-recipe.md
+├── ports/
+│   ├── inbound/
+│   │   └── openapi.yaml          ← what this capsule provides
+│   └── outbound/
+│       └── dependencies.yaml     ← what this capsule consumes
+├── tests/
+│   ├── test_acceptance.py        ← uses stubs driven by outbound contract
+│   ├── test_invariants.py
+│   ├── test_contract.py
+│   └── test_integration.py       ← verifies real adapter against live dependency
+├── fitness/
+└── src/                          ← disposable
+```
+
+A leaf capsule with no outbound dependencies (like `pricing-discount-capsule`) has an empty `dependencies.yaml`. The structure is uniform regardless of complexity.
+
+## Multi-Capsule Systems and the System Manifest
+
+When capsules depend on each other, the dependency graph is a system-level durable artifact. A `system.yaml` at the repository root declares all capsules and their relationships:
+
+```yaml
+capsules:
+  - name: pricing-discount-capsule
+    inbound_contract: ports/inbound/openapi.yaml
+    inbound_version: "1.0"
+    depends_on: []
+
+  - name: order-capsule
+    inbound_contract: ports/inbound/openapi.yaml
+    inbound_version: "1.0"
+    depends_on:
+      - capsule: pricing-discount-capsule
+        version: "1.0"
+        operations: [calculateDiscount]
+```
+
+The manifest enables three things that are impossible without it:
+
+1. **Impact analysis** — before regenerating any capsule, identify which consumers declare a dependency on it. Those consumers must re-run their integration tests after the regeneration.
+
+2. **Safe sequencing** — when multiple capsules need regeneration, the manifest determines the order: dependencies before dependents.
+
+3. **Contract compatibility checks** — the regenerated inbound contract must remain compatible with every consumer's declared version before the capsule can be safely deployed.
+
+### Regeneration Pre-Flight for Multi-Capsule Systems
+
+The single-capsule lifecycle gains a pre-flight gate when a system manifest exists:
+
+```
+Specify → Generate → Operate → Measure Slop → [Pre-flight] → Regenerate
+```
+
+Pre-flight steps:
+1. Read `system.yaml` and identify all capsules that list this capsule in their `depends_on`
+2. Confirm the new inbound contract is compatible with every consumer's declared version
+3. Clear: proceed with regeneration; after completion, trigger integration test runs in all dependent capsules
+4. Blocked: renegotiate the contract before proceeding
+
+This makes regeneration a system-aware operation without requiring a centralised orchestrator. The capsule remains the unit of regenerability; the manifest provides the coordination context.
+
 ## When to Regenerate vs Refactor
 
 Regeneration is preferable to refactoring when:

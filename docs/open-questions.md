@@ -62,11 +62,18 @@ How do you recognize this transition? What process should trigger an ownership r
 
 ## 6. How do you handle capsule-to-capsule contracts?
 
-When capsules call each other, the calling capsule depends on the callee's contract. If the callee is regenerated, its contract may change.
+**Partially addressed.** The ports model implemented in this repository provides a structural answer:
 
-- Should capsule-to-capsule contracts be treated as consumer-driven contracts?
-- How do you version internal contracts between capsules of the same system?
-- If both capsules are regenerated simultaneously, how do you ensure contract compatibility?
+- Each capsule declares outbound dependencies in `ports/outbound/dependencies.yaml`, including which operations it uses and which response fields it consumes. This is the consumer side of a consumer-driven contract.
+- A `system.yaml` at the repository root records the full dependency graph and enables impact analysis before regeneration.
+- Integration tests (`test_integration.py`) verify the real outbound adapter against the live dependency after regeneration.
+- The regeneration pre-flight check (described in `docs/concept.md`) sequences regeneration safely: dependencies before dependents.
+
+**Remaining open questions:**
+
+- How do you version internal contracts between capsules of the same system when breaking changes are unavoidable? The current model declares a version but does not enforce compatibility automatically.
+- If both capsules are regenerated simultaneously (e.g. a coordinated business rule change), how do you ensure contract compatibility before either is deployed?
+- At what point should capsule-to-capsule contracts be formalised with consumer-driven contract testing tooling (Pact, etc.) rather than integration tests?
 
 ---
 
