@@ -4,11 +4,9 @@
 # This script simulates regeneration by:
 # 1. Checking that durable artifacts are in place
 # 2. Removing the implementation file
-# 3. Regenerating from a reference copy (in a real workflow, an AI tool would do this)
+# 3. Regenerating from durable artifacts using Claude
 # 4. Running tests to verify correctness
 # 5. Running fitness functions to verify health
-#
-# In a real workflow, step 3 would call an AI coding tool with the regeneration recipe.
 
 set -euo pipefail
 
@@ -39,10 +37,26 @@ rm "$IMPL"
 echo "  Implementation removed (backup at $BACKUP)"
 
 echo ""
-echo "Step 3: Regenerate implementation from durable artifacts"
-echo "  (In a real workflow, an AI tool would read intent.md + tests + contract)"
-echo "  (and generate the implementation. Here we restore from the reference copy.)"
-cp "$BACKUP" "$IMPL"
+echo "Step 3: Regenerate implementation using Claude"
+claude -p "Regenerate $IMPL for the pricing-discount-capsule.
+
+Read these files first:
+  - $CAPSULE/intent.md
+  - $CAPSULE/contracts/openapi.yaml
+  - $CAPSULE/tests/test_acceptance.py
+  - $CAPSULE/tests/test_invariants.py
+
+Requirements:
+  - Function signature: calculate_discount(customer_tier: str, basket_total: float, active_campaign: bool) -> dict
+  - Return: {\"discount_percentage\": int, \"explanation\": list[str]}
+  - Implement all business rules from intent.md
+  - Keep the implementation simple and explicit — no rule engines or strategy patterns
+  - No external runtime dependencies beyond the Python standard library
+  - All tests in tests/ must pass
+
+Write the implementation to $IMPL. Do not add features or behavior beyond what the tests and intent.md require." \
+  --allowedTools "Read,Write" \
+  --output-format text
 echo "  Implementation regenerated."
 
 echo ""
