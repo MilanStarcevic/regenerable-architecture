@@ -53,8 +53,6 @@ Classic evolutionary architecture says: *build → measure → refactor → evol
 
 Regenerable Architecture says: *specify → generate → operate → measure slop → regenerate*.
 
-The key difference is that regeneration is not treated as a failure mode. It is a planned, tool-supported lifecycle event that the architecture is designed around from the start.
-
 ---
 
 ## Durable vs Disposable Artifacts
@@ -116,35 +114,7 @@ A **capability capsule** is the unit of regenerability.
 
 It bundles everything needed to specify, generate, operate, and regenerate a single business capability.
 
-```mermaid
-flowchart TB
-    subgraph Capsule["Capability Capsule"]
-        Intent[intent.md]
-        InboundPort[ports/inbound — what it provides]
-        OutboundPort[ports/outbound — what it consumes]
-        Tests[Acceptance, Invariant, Contract, Integration Tests]
-        Fitness[Fitness Functions]
-        Recipe[regeneration-recipe.md]
-        Implementation[Generated Implementation]
-    end
-
-    Intent --> Implementation
-    InboundPort --> Implementation
-    OutboundPort --> Implementation
-    Tests --> Implementation
-    Fitness --> Implementation
-    Recipe --> Implementation
-```
-
-A capability capsule is **not** a microservice. It can be:
-
-- A Python module or package
-- A serverless function group
-- A workflow or scheduled job
-- A domain layer inside a modular monolith
-- A deployable service when isolation genuinely justifies the overhead
-
-The boundary is conceptual and knowledge-preserving, not a deployment-topology decision.
+A capability capsule is **not** a microservice — the boundary is conceptual and knowledge-preserving, not a deployment decision. It can be a module, a serverless function group, a workflow, a domain layer in a modular monolith, or a deployable service when isolation genuinely justifies the overhead.
 
 ---
 
@@ -381,7 +351,7 @@ Expected output from `make fitness`:
 }
 ```
 
-The `test_confidence_score` of 100 reflects 43 tests covering acceptance behavior, invariants, and contract conformance—strong enough to make regeneration safe. High test confidence offsets the structural scores, producing a net slop score of 0. This is the expected result for a freshly specified, well-tested capsule.
+A `test_confidence_score` of 100 offsets the structural scores, producing a net slop score of 0 — the expected result for a freshly specified, well-tested capsule.
 
 See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the leaf capsule example, and [examples/order-capsule/](examples/order-capsule/) for a dependent capsule that consumes it via a declared outbound port. The `system.yaml` at the repository root shows the dependency graph across both.
 

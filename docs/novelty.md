@@ -87,10 +87,3 @@ The capsule bundles everything needed to specify, generate, and regenerate a sin
 **5. The regeneration recipe as a first-class artifact.**
 Explicit, version-controlled instructions for how to use AI tools to recreate a specific implementation from durable artifacts are not part of any existing architectural framework. The recipe is what makes regeneration repeatable rather than ad hoc.
 
----
-
-## The Differentiator
-
-> Regenerable Architecture is specifically about designing AI-assisted systems so that generated implementation can be safely discarded and recreated from preserved intent, contracts, tests, and data semantics.
-
-This cannot be said about evolutionary architecture, disposable architecture, contract-first design, or any other adjacent concept in isolation. The synthesis—and the specific problem it addresses—is the contribution.

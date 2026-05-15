@@ -218,20 +218,4 @@ flowchart TD
     H --> I[Create Migration / Export Contract]
 ```
 
-## The Distributed Slop Anti-Pattern
-
-The anti-pattern to avoid:
-
-```
-Capsule A → its own canonical DB
-Capsule B → its own canonical DB
-Capsule C → its own canonical DB
-```
-
-Each capsule maintains its own customer records, its own product data, its own pricing tables. All slightly different. All slightly inconsistent. No clear authority for resolving conflicts.
-
-When capsule A is regenerated, its database may be migrated incorrectly. When capsule B and capsule A have the same customer ID with different email addresses, there is no resolution strategy.
-
-This is distributed slop: the implementation-level chaos of many AI-generated services without a coherent data ownership strategy.
-
-The solution is not to avoid capsules. It is to ensure that canonical data lives in durable domain APIs, not in disposable capsule databases.
+The core failure mode to avoid — every capsule owning its own canonical database — is described in [docs/anti-patterns.md](anti-patterns.md) under "Distributed Slop."
