@@ -6,15 +6,18 @@ These questions do not have settled answers. They are worth working through befo
 
 ## 1. How do you detect semantic drift reliably?
 
-The heuristic approaches in this repository—checking for domain terms in tests, verifying invariants exist—are approximations. They can miss drift and produce false positives.
+**Partially addressed.** Durable health fitness functions (see [fitness-functions/durable-health.md](../fitness-functions/durable-health.md)) define a two-tier approach to detecting drift in the durable layer:
 
-More robust approaches might include:
-- LLM-assisted review: ask an AI model whether the implementation matches the intent document, with human approval gates
-- Formal specification languages that can be checked against implementation
-- Production behavior comparison: does the system's actual behavior match what the intent document predicts?
-- Traceability matrices: each requirement in `intent.md` mapped to specific tests
+- Tier 1 (mechanical): business rule count parity, contract field coverage, stub consistency — catch structural drift without LLM
+- Tier 2 (LLM-assisted): intent-test alignment, contract-intent alignment — catch semantic drift by asking whether the artifacts still describe the same capsule
 
-How much semantic drift is acceptable before triggering regeneration versus a specification review?
+The existing `semantic_drift_check.py` in implementation fitness measures drift between `intent.md` vocabulary and implementation source code. The new durable health checks measure drift *between durable artifacts themselves*.
+
+**Remaining open questions:**
+
+- How much intent-test misalignment is acceptable before blocking regeneration? The answer is likely domain-dependent: a regulated system may require 100% rule coverage; an internal tool may tolerate gaps.
+- How do you detect drift in the *direction* of change — whether intent has moved ahead of tests, or tests have moved ahead of intent? The two cases have different remediation paths.
+- At what cadence should Tier 2 (LLM-assisted) checks run in a team with many capsules? Running them on every commit is expensive; running them only before regeneration may miss drift that accumulates gradually.
 
 ---
 

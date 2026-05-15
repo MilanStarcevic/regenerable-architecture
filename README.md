@@ -168,9 +168,13 @@ See [docs/ai-slop.md](docs/ai-slop.md) for a detailed taxonomy and how each patt
 
 ---
 
-## Slop Fitness Functions
+## Fitness Functions
 
-Slop is measurable. The architecture includes automated fitness functions that run continuously or on demand.
+The architecture includes two complementary sets of fitness functions. Both use the same interface contract and can be run from the same runner.
+
+### Implementation Fitness (Slop)
+
+Measures whether the implementation layer has decayed to the point where regeneration is safer than further refactoring.
 
 ### Slop Score Formula
 
@@ -196,7 +200,17 @@ Normalized to 0–100. Test confidence is subtracted because strong tests reduce
 
 Thresholds are configurable. A team with comprehensive test coverage may tolerate higher complexity; a regulated-domain team may want stricter thresholds on semantic drift.
 
-See [fitness-functions/](fitness-functions/) for the signal specification, interface contract, and tool alternatives (SonarQube, ESLint, Roslyn analyzers, and others). The reference Python implementation is in [examples/pricing-discount-capsule/fitness/](examples/pricing-discount-capsule/fitness/).
+See [fitness-functions/README.md](fitness-functions/README.md) for the signal specification, interface contract, and tool alternatives (SonarQube, ESLint, Roslyn analyzers, and others). The reference Python implementation is in [examples/pricing-discount-capsule/fitness/](examples/pricing-discount-capsule/fitness/).
+
+### Durable Health Fitness
+
+Measures whether the durable artifacts themselves are internally consistent — whether intent, tests, contracts, stubs, and the regeneration recipe still describe the same capsule. A capsule with low slop but high durable health drift is unsafe to regenerate: the regenerated implementation will be guided by inconsistent artifacts and will fail in ways the tests do not catch.
+
+Durable health checks run in two tiers: mechanical checks (file integrity, contract coverage, stub consistency) run continuously in CI; LLM-assisted checks (intent-test alignment, contract-intent alignment, recipe currency) run as a pre-regeneration gate.
+
+**Durable health must gate regeneration. Slop scores alone do not.**
+
+See [fitness-functions/durable-health.md](fitness-functions/durable-health.md) for the full specification.
 
 ---
 

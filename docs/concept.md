@@ -148,6 +148,31 @@ Pre-flight steps:
 
 This makes regeneration a system-aware operation without requiring a centralised orchestrator. The capsule remains the unit of regenerability; the manifest provides the coordination context.
 
+## Durable Health Fitness
+
+Implementation slop fitness measures whether the implementation is decaying. Durable health fitness measures whether the artifacts from which we regenerate are still trustworthy.
+
+A capsule can have a zero slop score and still be unsafe to regenerate. If `intent.md` has drifted from the tests, the recipe references files that no longer exist, or a dependency has changed behavior while the declared stubs have not — regeneration will produce a new, clean implementation guided by wrong inputs. The tests will pass. The behavior will be wrong.
+
+Durable health checks run in two tiers:
+
+**Tier 1 — Mechanical (CI, always run):** Artifact completeness, recipe file integrity, contract field coverage, business rule count parity, stub consistency. Fast, no external dependencies.
+
+**Tier 2 — LLM-assisted (pre-regeneration gate):** Intent-test alignment, contract-intent alignment, recipe currency. These require semantic judgment that pattern matching cannot provide.
+
+The two scores interact predictably:
+
+| Slop Score | Durable Health | Meaning |
+|---|---|---|
+| Low | Low | Healthy — maintain |
+| High | Low | Decayed implementation — regeneration safe and indicated |
+| Low | High | Artifacts drifted — do not regenerate; strengthen artifacts first |
+| High | High | Most dangerous — regeneration needed but unsafe |
+
+**Durable health must gate regeneration. Slop scores alone do not.**
+
+See [fitness-functions/durable-health.md](../fitness-functions/durable-health.md) for the full signal specification, score formula, and implementation guidance.
+
 ## When to Regenerate vs Refactor
 
 Regeneration is preferable to refactoring when:
