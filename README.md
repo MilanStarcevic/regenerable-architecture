@@ -22,7 +22,9 @@ Over time, AI-generated code accumulates subtle problems:
 
 This is **AI slop**: accumulated implementation decay that looks acceptable in isolation but erodes the system's trustworthiness over time.
 
-The answer is not more code review. Reviewing every AI-generated line for subtle correctness is expensive and unreliable. The answer is to design systems so that decayed implementation can be safely discarded and recreated—and to preserve the knowledge needed to do that safely.
+The problem compounds in teams. When multiple developers each use AI tools on the same codebase, their independently generated code conflicts: overlapping abstractions, inconsistent vocabulary, duplicate logic written in parallel. Capability capsules address this directly — each capsule has a clear owner, a fixed contract surface, and a boundary that AI tools cannot cross. Contributors work independently without generating conflicts.
+
+The answer to decay is not more code review. Reviewing every AI-generated line for subtle correctness is expensive and unreliable. The answer is to design systems so that decayed implementation can be safely discarded and recreated—and to preserve the knowledge needed to do that safely.
 
 Regenerable Architecture provides that design.
 
