@@ -131,15 +131,14 @@ The manifest enables three things that are impossible without it:
 
 ## Artifact Drift Fitness
 
-Implementation implementation entropy fitness measures whether the implementation is decaying. Durable health fitness
-measures whether the artifacts from which we regenerate are still trustworthy.
+Implementation entropy fitness measures whether the implementation is decaying. Artifact drift fitness measures whether the artifacts from which we regenerate are still trustworthy.
 
 A capsule can have a zero entropy score and still be unsafe to regenerate. If `intent.md` has drifted
 from the tests, the recipe references files that no longer exist, or a dependency has changed
 behavior while the declared stubs have not — regeneration will produce a new, clean implementation
 guided by wrong inputs. The tests will pass. The behavior will be wrong.
 
-Durable health checks run in two tiers:
+Artifact drift checks run in two tiers:
 
 **Tier 1 — Mechanical (CI, always run):** Artifact completeness, recipe file integrity, contract
 field coverage, business rule count parity, stub consistency. Fast, no external dependencies.
@@ -156,7 +155,7 @@ The two scores interact predictably:
 | Low | High | Artifacts drifted — do not regenerate; strengthen artifacts first |
 | High | High | Most dangerous — regeneration needed but unsafe |
 
-**Durable health must gate regeneration. Entropy scores alone do not.**
+**Artifact drift must gate regeneration. Entropy scores alone do not.**
 
 See [fitness-functions/artifact-drift.md](../fitness-functions/artifact-drift.md) for the full
 signal specification, score formula, and implementation guidance.

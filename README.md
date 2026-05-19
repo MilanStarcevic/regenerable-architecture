@@ -80,18 +80,7 @@ flowchart LR
     F --> C
 ```
 
-Regenerable Architecture builds on evolutionary architecture but takes a different stance on what to
-preserve and what to discard:
-
-| Approach | Principle |
-|---|---|
-| Evolutionary architecture | Make systems easy to change |
-| Disposable architecture | Make components easy to replace |
-| **Regenerable architecture** | **Make implementation safe to recreate from preserved intent** |
-
-Classic evolutionary architecture says: *build → measure → refactor → evolve*.
-
-Regenerable Architecture says: *specify → generate → operate → measure entropy → regenerate*.
+Where evolutionary architecture asks "how do we make systems easy to change?", this asks "how do we make implementation safe to recreate from preserved intent?"
 
 ---
 
@@ -168,20 +157,7 @@ justifies the overhead.
 **AI implementation entropy** is the accumulation of small, individually defensible implementation choices that
 together erode the quality and trustworthiness of a system.
 
-Signs of AI implementation entropy:
-
-- Functions that are technically correct but too long to reason about confidently
-- Abstractions that exist because the model completed a pattern, not because the problem requires them
-- Duplicated logic in slightly different forms across the codebase
-- Imports pulled in for a single line of convenience
-- Tests that verify AI-invented behavior, not business behavior
-- Implementation vocabulary that has drifted from the domain
-- Business rules embedded in utility functions where they will not be found on review
-
-AI implementation entropy is not malicious. It is the natural byproduct of generation without architectural
-discipline.
-
-See [docs/implementation-entropy.md](docs/implementation-entropy.md) for a detailed taxonomy and how each pattern manifests.
+It is the natural byproduct of generation without architectural discipline. See [docs/implementation-entropy.md](docs/implementation-entropy.md) for a detailed taxonomy.
 
 ---
 
@@ -298,22 +274,9 @@ flowchart TD
     H --> I[Create Migration / Export Contract]
 ```
 
-Every capsule should classify its data before owning it:
+Every capsule should classify its data (canonical, derived, ephemeral, audit, configuration, or personal/sensitive) before owning it. Only canonical, audit, and personal/sensitive data require strong durability discipline; the rest can be treated as disposable.
 
-| Class | Description | Lifecycle |
-|---|---|---|
-| **Canonical** | Authoritative business record | Must survive capsule regeneration; own via a durable domain API |
-| **Derived** | Projection of canonical data | Can be discarded and rebuilt; owned by the capsule |
-| **Ephemeral** | Temporary state with a TTL | Loss is acceptable; session caches, rate counters, drafts |
-| **Audit** | Append-only record of events | Must survive regeneration; append-only means safe to preserve |
-| **Configuration** | Governs behavior | Externalize from the implementation |
-| **Personal/sensitive** | Subject to privacy regulation | Requires lifecycle governance regardless of capsule lifecycle |
-
-Only canonical, audit, and personal/sensitive data require strong durability discipline. The rest
-can be treated as part of the disposable layer.
-
-See [docs/data-strategies.md](docs/data-strategies.md) for the full treatment including outbox/inbox
-patterns, event replay, and migration contracts.
+See [docs/data-strategies.md](docs/data-strategies.md) for the full treatment including data classification, outbox/inbox patterns, event replay, and migration contracts.
 
 ---
 
@@ -476,10 +439,7 @@ dependency graph across both.
 
 ## Related Existing Concepts
 
-The individual ingredients in Regenerable Architecture are established ideas with existing names and
-tooling. The table below shows what each contributes. The distinctive claim is not that any one of
-them is novel—it is that combining them for the AI-era lifecycle creates a coherent approach that
-none addresses on its own.
+Each ingredient has existing names, tooling, and literature. The synthesis — not any single ingredient — is what is new.
 
 | Concept | Relationship |
 |---|---|
