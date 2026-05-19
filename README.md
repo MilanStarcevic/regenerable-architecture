@@ -8,6 +8,22 @@ The individual ingredients are established: evolutionary architecture, fitness f
 
 ---
 
+## Who This Is For
+
+This repository is intended for **software architects, principal engineers, and technical leaders** exploring architectural responses to AI-generated implementation code.
+
+It is not intended to be a production framework, SDK, CLI, or developer productivity tool. The value here is conceptual and structural: a vocabulary, a lifecycle, and a set of artifacts for reasoning about AI-era systems — not a platform to deploy.
+
+---
+
+## What This Is Not
+
+This repository does not provide a turnkey regeneration platform, a code-generation framework, or a universal scoring system. It does not automate the lifecycle. It does not replace the judgment required to define intent, write behavioral tests, or decide when to regenerate.
+
+The implementation is illustrative. It exists to make the pattern concrete, not to demonstrate production readiness.
+
+---
+
 ## Why This Exists
 
 AI coding tools make generating implementation code cheap. The problem is not the cost of generation—it is the cost of trusting what was generated.
@@ -260,12 +276,16 @@ regenerable-architecture/
 ├── README.md
 ├── system.yaml                  ← durable: capsule dependency graph
 ├── docs/
-│   ├── concept.md           ← in-depth explanation of the architecture
-│   ├── novelty.md           ← what is new, what is borrowed
-│   ├── ai-slop.md           ← taxonomy of AI slop patterns
-│   ├── data-strategies.md   ← data ownership strategies for capsule systems
-│   ├── anti-patterns.md     ← failure modes and how to avoid them
-│   └── open-questions.md    ← unresolved questions
+│   ├── concept.md                        ← in-depth explanation of the architecture
+│   ├── novelty.md                        ← what is new, what is borrowed
+│   ├── ai-slop.md                        ← taxonomy of AI slop patterns
+│   ├── data-strategies.md                ← data ownership strategies for capsule systems
+│   ├── anti-patterns.md                  ← failure modes and how to avoid them
+│   ├── when-not-to-use.md                ← contraindications for this pattern
+│   ├── capsule-assessment-checklist.md   ← evaluate a proposed capsule boundary
+│   ├── regeneration-readiness-checklist.md ← verify readiness before regenerating
+│   ├── adoption-maturity-model.md        ← staged adoption guide
+│   └── open-questions.md                 ← unresolved questions
 ├── examples/
 │   ├── pricing-discount-capsule/    ← leaf capsule: no outbound dependencies
 │   │   ├── intent.md                ← durable: business intent
@@ -318,6 +338,14 @@ regenerable-architecture/
 ```
 
 The durable / disposable distinction is structural: `intent.md`, `ports/`, `tests/`, and `fitness/` are preserved across regenerations; `src/` is the disposable output. The `system.yaml` at the root preserves the dependency graph across all capsules.
+
+---
+
+## About the Examples
+
+The examples are deliberately small. Their purpose is to make the architectural pattern concrete and reviewable — not to demonstrate production readiness or developer usability.
+
+A real capability capsule would have more complex domain logic, richer test suites, and more detailed regeneration recipes. The examples show the structure and the artifact relationships. They are reference points for understanding, not templates to copy directly into production systems.
 
 ---
 
@@ -396,6 +424,17 @@ Full descriptions in [docs/anti-patterns.md](docs/anti-patterns.md). Key failure
 - **Nano-service explosion** — the capsule boundary is misread as a deployment boundary; operational costs multiply
 - **Fitness function theater** — metrics are measured but thresholds are never acted on
 - **Durable artifact neglect** — intent documents and recipes are created once and never updated
+
+---
+
+## Architect-Level Reference
+
+Reference artifacts for applying and evaluating the pattern:
+
+- [docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md) — evaluate whether a proposed capsule boundary is well-defined before writing the first artifact
+- [docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md) — verify that durable artifacts are strong enough to regenerate safely
+- [docs/adoption-maturity-model.md](docs/adoption-maturity-model.md) — understand how teams adopt the pattern incrementally, from no discipline to active regeneration lifecycle
+- [docs/when-not-to-use.md](docs/when-not-to-use.md) — recognize when the pattern is the wrong choice for the context
 
 ---
 
