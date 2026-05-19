@@ -1,6 +1,6 @@
 """
 Stub Consistency Check — pricing-discount-capsule.
-See fitness-functions/durable-health.md for the interface contract.
+See fitness-functions/artifact-drift.md for the interface contract.
 
 This capsule has no outbound dependencies (ports/outbound/dependencies.yaml
 declares an empty list). The check trivially passes.

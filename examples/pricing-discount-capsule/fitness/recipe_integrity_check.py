@@ -1,6 +1,6 @@
 """
 Recipe Integrity Check — reference implementation.
-See fitness-functions/durable-health.md for the interface contract.
+See fitness-functions/artifact-drift.md for the interface contract.
 
 Verifies that every file path explicitly referenced in regeneration-recipe.md
 exists on disk relative to the capsule root. Detects the silent drift that

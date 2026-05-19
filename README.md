@@ -190,15 +190,15 @@ Thresholds are configurable. A team with comprehensive test coverage may tolerat
 
 See [fitness-functions/README.md](fitness-functions/README.md) for the signal specification, interface contract, and tool alternatives (SonarQube, ESLint, Roslyn analyzers, and others). The reference Python implementation is in [examples/pricing-discount-capsule/fitness/](examples/pricing-discount-capsule/fitness/).
 
-### Durable Health Fitness
+### Artifact Drift Fitness
 
-Measures whether the durable artifacts themselves are internally consistent — whether intent, tests, contracts, stubs, and the regeneration recipe still describe the same capsule. A capsule with low slop but high durable health drift is unsafe to regenerate: the regenerated implementation will be guided by inconsistent artifacts and will fail in ways the tests do not catch.
+Measures whether the durable artifacts themselves are internally consistent — whether intent, tests, contracts, stubs, and the regeneration recipe still describe the same capsule. A capsule with low slop but a high artifact drift score is unsafe to regenerate: the regenerated implementation will be guided by inconsistent artifacts and will fail in ways the tests do not catch.
 
-Durable health checks run in two tiers: mechanical checks (file integrity, contract coverage, stub consistency) run continuously in CI; LLM-assisted checks (intent-test alignment, contract-intent alignment, recipe currency) run as a pre-regeneration gate.
+Artifact drift checks run in two tiers: mechanical checks (file integrity, contract coverage, stub consistency) run continuously in CI; LLM-assisted checks (intent-test alignment, contract-intent alignment, recipe currency) run as a pre-regeneration gate.
 
-**Durable health must gate regeneration. Slop scores alone do not.**
+**Artifact drift must gate regeneration. Slop scores alone do not.**
 
-See [fitness-functions/durable-health.md](fitness-functions/durable-health.md) for the full specification.
+See [fitness-functions/artifact-drift.md](fitness-functions/artifact-drift.md) for the full specification.
 
 ---
 
@@ -276,16 +276,17 @@ regenerable-architecture/
 ├── README.md
 ├── system.yaml                  ← durable: capsule dependency graph
 ├── docs/
-│   ├── concept.md                        ← in-depth explanation of the architecture
-│   ├── novelty.md                        ← what is new, what is borrowed
-│   ├── ai-slop.md                        ← taxonomy of AI slop patterns
-│   ├── data-strategies.md                ← data ownership strategies for capsule systems
-│   ├── anti-patterns.md                  ← failure modes and how to avoid them
-│   ├── when-not-to-use.md                ← contraindications for this pattern
-│   ├── capsule-assessment-checklist.md   ← evaluate a proposed capsule boundary
+│   ├── concept.md                          ← in-depth explanation of the architecture
+│   ├── novelty.md                          ← what is new, what is borrowed
+│   ├── ai-slop.md                          ← taxonomy of AI slop patterns
+│   ├── data-strategies.md                  ← data ownership strategies for capsule systems
+│   ├── anti-patterns.md                    ← failure modes and how to avoid them
+│   ├── cheat-sheet.md                      ← single-page architect reference
+│   ├── when-not-to-use.md                  ← contraindications for this pattern
+│   ├── capsule-assessment-checklist.md     ← evaluate a proposed capsule boundary
 │   ├── regeneration-readiness-checklist.md ← verify readiness before regenerating
-│   ├── adoption-maturity-model.md        ← staged adoption guide
-│   └── open-questions.md                 ← unresolved questions
+│   ├── adoption-maturity-model.md          ← staged adoption guide
+│   └── open-questions.md                   ← unresolved questions
 ├── examples/
 │   ├── pricing-discount-capsule/    ← leaf capsule: no outbound dependencies
 │   │   ├── intent.md                ← durable: business intent
@@ -302,13 +303,19 @@ regenerable-architecture/
 │   │   │   ├── test_contract.py     ← durable: contract conformance
 │   │   │   └── test_invariants.py   ← durable: invariant tests
 │   │   ├── fitness/
-│   │   │   ├── slop_score.py        ← durable: reference fitness runner
-│   │   │   ├── complexity_check.py  ← durable: reference implementation
+│   │   │   ├── slop_score.py              ← durable: slop fitness runner
+│   │   │   ├── artifact_drift.py          ← durable: artifact drift runner
+│   │   │   ├── complexity_check.py
 │   │   │   ├── duplication_check.py
 │   │   │   ├── dependency_check.py
 │   │   │   ├── test_confidence_check.py
 │   │   │   ├── semantic_drift_check.py
-│   │   │   └── changeability_check.py
+│   │   │   ├── changeability_check.py
+│   │   │   ├── artifact_completeness_check.py
+│   │   │   ├── recipe_integrity_check.py
+│   │   │   ├── contract_coverage_check.py
+│   │   │   ├── rule_parity_check.py
+│   │   │   └── stub_consistency_check.py
 │   │   └── README.md
 │   └── order-capsule/               ← dependent capsule: consumes pricing-discount-capsule
 │       ├── intent.md                ← durable: business intent
@@ -328,7 +335,8 @@ regenerable-architecture/
 │       ├── fitness/
 │       └── README.md
 ├── fitness-functions/
-│   └── README.md                ← signal spec and tool alternatives (language-agnostic)
+│   ├── README.md                ← slop signal spec and tool alternatives (language-agnostic)
+│   └── artifact-drift.md        ← artifact drift signal spec and interface contract
 ├── scripts/
 │   ├── run-fitness.sh
 │   └── regenerate-example.sh
@@ -346,6 +354,28 @@ The durable / disposable distinction is structural: `intent.md`, `ports/`, `test
 The examples are deliberately small. Their purpose is to make the architectural pattern concrete and reviewable — not to demonstrate production readiness or developer usability.
 
 A real capability capsule would have more complex domain logic, richer test suites, and more detailed regeneration recipes. The examples show the structure and the artifact relationships. They are reference points for understanding, not templates to copy directly into production systems.
+
+---
+
+## How an Architect Should Read This Repository
+
+Suggested order for first-time consumption:
+
+1. **README.md** *(this file)* — lifecycle, core concepts, two-score model
+2. **[docs/concept.md](docs/concept.md)** — ports, multi-capsule systems, two-score interaction
+3. **[docs/when-not-to-use.md](docs/when-not-to-use.md)** — assess whether the pattern fits your context
+4. **[docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md)** — evaluate a proposed capsule boundary
+5. **[docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md)** — understand the pre-regeneration gate
+6. **[system.yaml](system.yaml)** — see how the dependency graph is declared
+7. **[examples/pricing-discount-capsule/](examples/pricing-discount-capsule/)** — inspect a leaf capsule end to end
+8. **[examples/order-capsule/](examples/order-capsule/)** — inspect a dependent capsule and its outbound declarations
+
+If you want to go deeper on a specific concern:
+
+- Failure modes → [docs/anti-patterns.md](docs/anti-patterns.md)
+- Team adoption → [docs/adoption-maturity-model.md](docs/adoption-maturity-model.md)
+- Data ownership at scale → [docs/data-strategies.md](docs/data-strategies.md)
+- Artifact drift signal specification → [fitness-functions/artifact-drift.md](fitness-functions/artifact-drift.md)
 
 ---
 
@@ -431,6 +461,7 @@ Full descriptions in [docs/anti-patterns.md](docs/anti-patterns.md). Key failure
 
 Reference artifacts for applying and evaluating the pattern:
 
+- [docs/cheat-sheet.md](docs/cheat-sheet.md) — single-page summary: when to use, two-score model, lifecycle, durable layer, adoption stages
 - [docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md) — evaluate whether a proposed capsule boundary is well-defined before writing the first artifact
 - [docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md) — verify that durable artifacts are strong enough to regenerate safely
 - [docs/adoption-maturity-model.md](docs/adoption-maturity-model.md) — understand how teams adopt the pattern incrementally, from no discipline to active regeneration lifecycle

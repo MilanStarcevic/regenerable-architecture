@@ -6,12 +6,12 @@ These questions do not have settled answers. They are worth working through befo
 
 ## 1. How do you detect semantic drift reliably?
 
-**Partially addressed.** Durable health fitness functions (see [fitness-functions/durable-health.md](../fitness-functions/durable-health.md)) define a two-tier approach to detecting drift in the durable layer:
+**Partially addressed.** Durable health fitness functions (see [fitness-functions/artifact-drift.md](../fitness-functions/artifact-drift.md)) define a two-tier approach to detecting drift in the durable layer:
 
 - Tier 1 (mechanical): business rule count parity, contract field coverage, stub consistency — catch structural drift without LLM
 - Tier 2 (LLM-assisted): intent-test alignment, contract-intent alignment — catch semantic drift by asking whether the artifacts still describe the same capsule
 
-The existing `semantic_drift_check.py` in implementation fitness measures drift between `intent.md` vocabulary and implementation source code. The new durable health checks measure drift *between durable artifacts themselves*.
+The existing `semantic_drift_check.py` in implementation fitness measures drift between `intent.md` vocabulary and implementation source code. The new artifact drift checks measure drift *between durable artifacts themselves*.
 
 **Remaining open questions:**
 

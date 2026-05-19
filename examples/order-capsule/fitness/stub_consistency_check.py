@@ -1,6 +1,6 @@
 """
 Stub Consistency Check — order-capsule.
-See fitness-functions/durable-health.md for the interface contract.
+See fitness-functions/artifact-drift.md for the interface contract.
 
 Reads each stub_behaviours entry in ports/outbound/dependencies.yaml,
 invokes the real pricing-discount-capsule with the declared input, and

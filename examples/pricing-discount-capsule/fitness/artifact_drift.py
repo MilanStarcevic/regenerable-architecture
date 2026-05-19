@@ -1,16 +1,16 @@
 """
-Durable Health Score — Order Capsule
+Artifact Drift Score — Pricing Discount Capsule
 
-Composite runner for the durable-layer fitness function.
-See fitness-functions/durable-health.md for the interface specification.
+Composite runner for the artifact drift fitness function.
+See fitness-functions/artifact-drift.md for the interface specification.
 
 Runs five mechanical checks against the capsule's durable artifacts and
 produces a weighted composite score. A score above the block threshold
 means the durable layer has drifted and regeneration should be gated.
 
 Usage:
-  python3 fitness/durable_health.py [--verbose]
-  python3 examples/order-capsule/fitness/durable_health.py [--verbose]
+  python3 fitness/artifact_drift.py [--verbose]
+  python3 examples/pricing-discount-capsule/fitness/artifact_drift.py [--verbose]
 """
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ def _status(score: float) -> tuple[str, str]:
     return "urgently_unsafe", "durable artifacts are severely inconsistent"
 
 
-def compute_durable_health(directory: str | Path, verbose: bool = False) -> dict:
+def compute_artifact_drift(directory: str | Path, verbose: bool = False) -> dict:
     directory = Path(directory)
 
     completeness = artifact_completeness_check(directory)
@@ -88,7 +88,7 @@ def compute_durable_health(directory: str | Path, verbose: bool = False) -> dict
         "contract_coverage_score": coverage_score,
         "rule_parity_score": parity_score,
         "stub_consistency_score": stubs_score,
-        "durable_health_score": composite,
+        "artifact_drift_score": composite,
         "status": status,
         "status_note": status_note,
         "safe_to_regenerate": safe_to_regenerate,
@@ -108,12 +108,12 @@ def compute_durable_health(directory: str | Path, verbose: bool = False) -> dict
 
 if __name__ == "__main__":
     verbose = "--verbose" in sys.argv or "-v" in sys.argv
-    result = compute_durable_health(CAPSULE_DIR, verbose=verbose)
+    result = compute_artifact_drift(CAPSULE_DIR, verbose=verbose)
     print(json.dumps(result, indent=2))
 
     if not result["safe_to_regenerate"]:
         print(
-            f"\nWARNING: Durable health score {result['durable_health_score']} >= block threshold {BLOCK_THRESHOLD}.",
+            f"\nWARNING: Artifact drift score {result['artifact_drift_score']} >= block threshold {BLOCK_THRESHOLD}.",
             file=sys.stderr,
         )
         print(f"Status: {result['status']} — {result['status_note']}", file=sys.stderr)

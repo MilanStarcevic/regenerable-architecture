@@ -1,22 +1,22 @@
-# Durable Health Fitness Functions
+# Artifact Drift Fitness Functions
 
-Durable health functions are automated checks that measure the internal consistency of the durable artifact layer in a capability capsule. They answer a different question from slop fitness functions: not "is the implementation decaying?" but "are the artifacts from which we regenerate still trustworthy?"
+Artifact drift functions are automated checks that measure the internal consistency of the durable artifact layer in a capability capsule. They answer a different question from slop fitness functions: not "is the implementation decaying?" but "are the artifacts from which we regenerate still trustworthy?"
 
-This matters because a capsule can have a zero slop score and still be unsafe to regenerate — if `intent.md` has drifted from the tests, or the regeneration recipe points to files that no longer exist, or a dependency's behavior has changed while the declared stubs have not. Implementation fitness measures what was built. Durable health measures whether you could safely build it again.
+This matters because a capsule can have a zero slop score and still be unsafe to regenerate — if `intent.md` has drifted from the tests, or the regeneration recipe points to files that no longer exist, or a dependency's behavior has changed while the declared stubs have not. Implementation fitness measures what was built. Artifact drift measures whether you could safely build it again.
 
 This document defines:
 
-1. **The interface contract** — what any durable health check must produce
+1. **The interface contract** — what any artifact drift check must produce
 2. **The two tiers** — mechanical checks and LLM-assisted checks, when to run each
 3. **The eight signals** — what to measure, why it matters, and how to approach it
-4. **The composite durable health score** — how signals combine into a regeneration gate
+4. **The composite artifact drift score** — how signals combine into a regeneration gate
 5. **The relationship to slop fitness** — how the two scores interact
 
 ---
 
 ## Interface Contract
 
-Each durable health check takes a capsule directory as input and returns a JSON-compatible dict with at minimum a `"score"` key:
+Each artifact drift check takes a capsule directory as input and returns a JSON-compatible dict with at minimum a `"score"` key:
 
 ```json
 {
@@ -28,13 +28,13 @@ Each durable health check takes a capsule directory as input and returns a JSON-
 - Additional keys provide supporting detail for diagnostics
 - Any tool or script that produces this shape satisfies the interface
 
-The composite durable health runner calls each check, combines scores using the formula below, and outputs the aggregate result alongside a regeneration safety verdict.
+The composite artifact drift runner calls each check, combines scores using the formula below, and outputs the aggregate result alongside a regeneration safety verdict.
 
 ---
 
 ## Two Tiers
 
-Durable health checks divide into two tiers based on what they require to run.
+Artifact drift checks divide into two tiers based on what they require to run.
 
 ### Tier 1 — Mechanical (always run)
 
@@ -52,10 +52,10 @@ Both tiers use the same interface contract. A runner can execute them separately
 
 ---
 
-## Durable Health Score Formula
+## Artifact Drift Score Formula
 
 ```
-Durable Health Score =
+Artifact Drift Score =
   artifact_completeness_score
 + recipe_integrity_score
 + contract_coverage_score
@@ -69,13 +69,13 @@ Durable Health Score =
 Normalized to 0–100. All signals are additive penalties: a score of 0 means all checks pass.
 
 | Score | Status | Action |
-|---|---|---|
+| --- | --- | --- |
 | 0 | Fully consistent | Regeneration safe (subject to slop threshold) |
 | 1–15 | Minor drift | Investigate and resolve before next regeneration |
 | 16–30 | Moderate drift | Resolve before regenerating; do not regenerate until addressed |
 | 31–100 | Severe drift | Regeneration unsafe; strengthen durable artifacts first |
 
-**The threshold for blocking regeneration is low.** A slop score of 50 may still permit regeneration with care. A durable health score of 20 should block it: artifacts that are wrong produce implementations that are wrong in ways the tests will not catch. This is the failure mode the architecture is specifically designed to avoid.
+**The threshold for blocking regeneration is low.** A slop score of 50 may still permit regeneration with care. An artifact drift score of 20 should block it: artifacts that are wrong produce implementations that are wrong in ways the tests will not catch. This is the failure mode the architecture is specifically designed to avoid.
 
 ---
 
@@ -175,25 +175,25 @@ Normalized to 0–100. All signals are additive penalties: a score of 0 means al
 
 The two scores measure orthogonal things and should be read together, not averaged.
 
-| Slop Score | Durable Health Score | Meaning |
-|---|---|---|
+| Slop Score | Artifact Drift Score | Meaning |
+| --- | --- | --- |
 | Low | Low | Healthy. Maintain. |
 | High | Low | Implementation has decayed. Regeneration is safe and indicated. |
 | Low | High | Implementation looks healthy but artifacts are drifted. **Do not regenerate.** Strengthen durable artifacts first. |
 | High | High | Most dangerous state. Regeneration is needed but unsafe. Strengthen durable artifacts first, then regenerate. |
 
-The high slop / high durable health case is the failure mode the architecture most needs to protect against. An undisciplined team facing this condition is tempted to regenerate because the slop is high. The regeneration fails silently: a new, clean implementation guided by inconsistent artifacts. The result is an implementation that passes old tests, satisfies a drifted contract, and does not match current business intent.
+The high slop / high artifact drift case is the failure mode the architecture most needs to protect against. An undisciplined team facing this condition is tempted to regenerate because the slop is high. The regeneration fails silently: a new, clean implementation guided by inconsistent artifacts. The result is an implementation that passes old tests, satisfies a drifted contract, and does not match current business intent.
 
-**Durable health must gate regeneration. Slop scores alone do not.**
+**Artifact drift must gate regeneration. Slop scores alone do not.**
 
 ---
 
 ## Using SonarQube and Existing Tools
 
-Existing tools do not directly address durable health. SonarQube, ESLint, and similar tools measure implementation quality. The signals described here require reading and interpreting durable artifacts, which no general-purpose static analysis tool currently does.
+Existing tools do not directly address artifact drift. SonarQube, ESLint, and similar tools measure implementation quality. The signals described here require reading and interpreting durable artifacts, which no general-purpose static analysis tool currently does.
 
 | Signal | Existing tool coverage |
-|---|---|
+| --- | --- |
 | Artifact completeness | File system checks — trivially implementable without tooling |
 | Recipe file integrity | Custom check only |
 | Contract field coverage | Partial: OpenAPI validators check contract syntax, not test coverage |
@@ -212,7 +212,7 @@ The Tier 1 checks are straightforward to implement in any language that can pars
 Working Python implementations of all five Tier 1 checks live in both example capsules:
 
 | Check | File |
-|---|---|
+| --- | --- |
 | Artifact completeness | `examples/pricing-discount-capsule/fitness/artifact_completeness_check.py` |
 | Recipe integrity | `examples/pricing-discount-capsule/fitness/recipe_integrity_check.py` |
 | Contract field coverage | `examples/pricing-discount-capsule/fitness/contract_coverage_check.py` |
@@ -220,11 +220,11 @@ Working Python implementations of all five Tier 1 checks live in both example ca
 | Stub consistency (no deps) | `examples/pricing-discount-capsule/fitness/stub_consistency_check.py` |
 | Stub consistency (with deps) | `examples/order-capsule/fitness/stub_consistency_check.py` |
 
-The composite runner `durable_health.py` imports all five checks, applies the weights defined in this document, and outputs the regeneration safety verdict:
+The composite runner `artifact_drift.py` imports all five checks, applies the weights defined in this document, and outputs the regeneration safety verdict:
 
 ```
-python3 examples/pricing-discount-capsule/fitness/durable_health.py [--verbose]
-python3 examples/order-capsule/fitness/durable_health.py [--verbose]
+python3 examples/pricing-discount-capsule/fitness/artifact_drift.py [--verbose]
+python3 examples/order-capsule/fitness/artifact_drift.py [--verbose]
 ```
 
 The `pricing-discount-capsule` implementation is the simpler reference (leaf capsule, no outbound dependencies). The `order-capsule` implementation shows stub consistency verification against a real upstream capsule.

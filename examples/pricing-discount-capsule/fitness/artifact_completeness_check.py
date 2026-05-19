@@ -1,6 +1,6 @@
 """
 Artifact Completeness Check — reference implementation.
-See fitness-functions/durable-health.md for the interface contract.
+See fitness-functions/artifact-drift.md for the interface contract.
 
 Verifies that all required durable artifacts are present in the capsule.
 A capsule missing any of these cannot be safely regenerated regardless of

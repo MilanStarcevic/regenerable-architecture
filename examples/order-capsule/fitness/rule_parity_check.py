@@ -1,6 +1,6 @@
 """
 Rule Parity Check — reference implementation.
-See fitness-functions/durable-health.md for the interface contract.
+See fitness-functions/artifact-drift.md for the interface contract.
 
 Compares the count of business rules declared in intent.md against the count
 of acceptance test methods in tests/test_acceptance.py. Each rule is expected

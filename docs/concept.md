@@ -112,7 +112,7 @@ The manifest enables three things that are impossible without it:
 
 3. **Contract compatibility checks** — the regenerated inbound contract must remain compatible with every consumer's declared version before the capsule can be safely deployed.
 
-## Durable Health Fitness
+## Artifact Drift Fitness
 
 Implementation slop fitness measures whether the implementation is decaying. Durable health fitness measures whether the artifacts from which we regenerate are still trustworthy.
 
@@ -126,7 +126,7 @@ Durable health checks run in two tiers:
 
 The two scores interact predictably:
 
-| Slop Score | Durable Health | Meaning |
+| Slop Score | Artifact Drift | Meaning |
 |---|---|---|
 | Low | Low | Healthy — maintain |
 | High | Low | Decayed implementation — regeneration safe and indicated |
@@ -135,7 +135,7 @@ The two scores interact predictably:
 
 **Durable health must gate regeneration. Slop scores alone do not.**
 
-See [fitness-functions/durable-health.md](../fitness-functions/durable-health.md) for the full signal specification, score formula, and implementation guidance.
+See [fitness-functions/artifact-drift.md](../fitness-functions/artifact-drift.md) for the full signal specification, score formula, and implementation guidance.
 
 ## The Discipline Required
 

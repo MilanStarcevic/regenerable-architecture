@@ -70,14 +70,14 @@ A failed checklist item is not a blocker for regeneration in all cases — but i
 
 ---
 
-## 7. Durable Health Fitness
+## 7. Artifact Drift Fitness
 
 - [ ] Durable health fitness has been run (Tier 1 mechanical checks)
 - [ ] No Tier 1 failures are present
-- [ ] LLM-assisted durable health checks (Tier 2) have been run if available
+- [ ] LLM-assisted artifact drift checks (Tier 2) have been run if available
 - [ ] No Tier 2 failures are present, or all failures are documented and accepted as known risk
 
-**Why this matters:** Durable health fitness catches inconsistencies between artifacts that cannot be detected from any single artifact. A high durable health score indicates the artifacts describe different capsules and regeneration will fail.
+**Why this matters:** Durable health fitness catches inconsistencies between artifacts that cannot be detected from any single artifact. A high artifact drift score indicates the artifacts describe different capsules and regeneration will fail.
 
 ---
 

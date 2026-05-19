@@ -1,6 +1,6 @@
 """
 Contract Coverage Check — reference implementation.
-See fitness-functions/durable-health.md for the interface contract.
+See fitness-functions/artifact-drift.md for the interface contract.
 
 Verifies that every required field declared in ports/inbound/openapi.yaml
 has at least one reference in tests/test_contract.py. An uncovered required
