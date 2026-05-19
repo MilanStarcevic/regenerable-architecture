@@ -1,122 +1,62 @@
 # Open Questions
 
-These questions do not have settled answers. They are worth working through before applying the pattern at scale, because the decisions made here determine whether the lifecycle actually functions in practice or just looks good on paper.
+These questions do not have settled answers. They are worth working through before applying the
+pattern at scale, because the decisions made here determine whether the lifecycle actually functions
+in practice or just looks good on paper.
 
 ---
 
-## 1. How do you detect semantic drift reliably?
+## 1. How do fitness function thresholds evolve as systems mature?
 
-**Partially addressed.** Durable health fitness functions (see [fitness-functions/artifact-drift.md](../fitness-functions/artifact-drift.md)) define a two-tier approach to detecting drift in the durable layer:
+Initial thresholds are calibrated against a naive baseline. As teams progress through the adoption
+maturity levels, their baseline shifts. Should thresholds tighten over time?
 
-- Tier 1 (mechanical): business rule count parity, contract field coverage, stub consistency — catch structural drift without LLM
-- Tier 2 (LLM-assisted): intent-test alignment, contract-intent alignment — catch semantic drift by asking whether the artifacts still describe the same capsule
+A team that consistently achieves an entropy score of 10 should probably recalibrate their threshold
+from 50 to 25 — otherwise the fitness function loses its signal. The adoption maturity model
+([docs/adoption-maturity-model.md](adoption-maturity-model.md)) describes the advancement signals,
+but does not prescribe threshold recalibration.
 
-The existing `semantic_drift_check.py` in implementation fitness measures drift between `intent.md` vocabulary and implementation source code. The new artifact drift checks measure drift *between durable artifacts themselves*.
+**Still open for architects:**
 
-**Remaining open questions:**
+- Should thresholds be absolute values or relative to a capsule's historical baseline?
+- Who owns the threshold calibration decision — the capsule owner, the architecture team, or a
+  central governance body?
 
-- How much intent-test misalignment is acceptable before blocking regeneration? The answer is likely domain-dependent: a regulated system may require 100% rule coverage; an internal tool may tolerate gaps.
-- How do you detect drift in the *direction* of change — whether intent has moved ahead of tests, or tests have moved ahead of intent? The two cases have different remediation paths.
-- At what cadence should Tier 2 (LLM-assisted) checks run in a team with many capsules? Running them on every commit is expensive; running them only before regeneration may miss drift that accumulates gradually.
 
----
+## 2. When does a capsule's data ownership become load-bearing?
 
-## 2. What is the right granularity for a capability capsule?
+**Partially addressed.** The `system.yaml` now classifies data as canonical, derived, or ephemeral
+per capsule. The data strategies doc ([docs/data-strategies.md](data-strategies.md)) covers
+ownership patterns.
 
-Too fine: nano-service explosion. Too coarse: monolithic capsules that are never actually regenerated because they are too large.
+**Still open for architects:**
 
-There is no universal answer. Possible heuristics:
-- A capsule should be regenerable in a single AI session
-- A capsule should have fewer than N acceptance tests (rough size signal)
-- A capsule should map to a single business capability, not a technical function
-- A capsule should be owned by a single team
+- Some capsules start as experiments and accumulate canonical data over time. At what point does the
+  data classification require a formal review? What triggers the escalation from "derived" to
+  "canonical"?
+- How do you migrate canonical data ownership from a disposable capsule to a durable domain API
+  without disrupting consumers?
+- The `lifecycle_level` field in `system.yaml` tracks adoption maturity but does not encode data
+  durability requirements. A Level 1 capsule that has accumulated canonical data is in an unsafe
+  state that the manifest alone cannot flag.
 
-How do you decide when a growing capsule should be split?
 
----
+## 3. What does regenerable architecture add beyond rigorous TDD?
 
-## 3. How do fitness function thresholds evolve as systems mature?
+Strong behavioral tests are a prerequisite for safe regeneration. A well-tested capsule with explicit
+contracts is already close to regenerable. The question matters to architects evaluating whether to
+adopt the full pattern or simply enforce better testing discipline.
 
-Initial thresholds are calibrated against a naive baseline. As the team gets better at writing regenerable capsules, the baseline shifts. Should thresholds tighten over time? Should they be set relative to a team's historical performance rather than absolute values?
+The additions beyond TDD:
 
-A team that consistently achieves a slop score of 10 should probably recalibrate their threshold from 50 to 25—otherwise the fitness function loses its signal.
+- **Explicit lifecycle:** the *specify → generate → operate → measure → regenerate* cycle is a
+  first-class concern, not a developer practice.
+- **Dual-score measurement:** entropy score (implementation decay) and artifact drift score (spec
+  consistency) together provide a regeneration gate that test coverage alone does not.
+- **Structured artifact layer:** `intent.md`, regeneration recipe, and `system.yaml` preserve the
+  knowledge needed to recreate the implementation — not just verify it.
+- **Regeneration as the exit:** TDD enables confident refactoring; RA enables confident discarding.
 
----
-
-## 4. How do you govern regeneration in teams with many contributors?
-
-Regeneration is a high-stakes operation. The implementation is discarded. If the durable artifacts are not strong enough, the regenerated implementation may be wrong.
-
-Questions:
-- Who can authorize a regeneration?
-- What review process should precede regeneration?
-- How do you ensure the regeneration recipe is current before triggering?
-- What happens if regeneration fails mid-process in a production system?
-
----
-
-## 5. When does a disposable capsule earn the right to become a durable domain?
-
-Some capsules start as experiments and become critical. At some point, the data they generate, the contracts they establish, or the integrations they support become too valuable to treat as disposable.
-
-How do you recognize this transition? What process should trigger an ownership review? How do you migrate a capsule from disposable to durable without disruption?
-
----
-
-## 6. How do you handle capsule-to-capsule contracts?
-
-**Partially addressed.** The ports model implemented in this repository provides a structural answer:
-
-- Each capsule declares outbound dependencies in `ports/outbound/dependencies.yaml`, including which operations it uses and which response fields it consumes. This is the consumer side of a consumer-driven contract.
-- A `system.yaml` at the repository root records the full dependency graph and enables impact analysis before regeneration.
-- Integration tests (`test_integration.py`) verify the real outbound adapter against the live dependency after regeneration.
-- The regeneration pre-flight check (described in `docs/concept.md`) sequences regeneration safely: dependencies before dependents.
-
-**Remaining open questions:**
-
-- How do you version internal contracts between capsules of the same system when breaking changes are unavoidable? The current model declares a version but does not enforce compatibility automatically.
-- If both capsules are regenerated simultaneously (e.g. a coordinated business rule change), how do you ensure contract compatibility before either is deployed?
-- At what point should capsule-to-capsule contracts be formalised with consumer-driven contract testing tooling (Pact, etc.) rather than integration tests?
-
----
-
-## 7. What is the role of the regeneration recipe in a team that uses multiple AI tools?
-
-The regeneration recipe documents how to recreate the implementation. But AI tools differ in their capabilities and tendencies. A recipe that works well with one model may produce poor results with another.
-
-- Should recipes be tool-agnostic?
-- Should recipes capture model-specific guidance as optional annotations?
-- How do you evaluate whether a recipe is "good enough" before it is needed?
-
----
-
-## 8. How do you measure the value of durable artifacts over time?
-
-The durable artifact investment—writing intent documents, tests, contracts, regeneration recipes—is upfront cost that pays off at regeneration time. But regeneration may be infrequent. How do you justify the investment?
-
-Possible metrics:
-- Time to regenerate: how long does regeneration take with good versus poor durable artifacts?
-- Regeneration success rate: how often does the first regeneration pass all tests?
-- Onboarding time: how long does a new team member take to understand a capsule?
-- Change safety: how often do changes cause unexpected breakage?
-
----
-
-## 9. Is there a meaningful boundary between regenerable architecture and test-driven development?
-
-Strong behavioral tests are a prerequisite for safe regeneration. In some sense, a well-tested capsule with clear contracts is already close to regenerable.
-
-What does regenerable architecture add beyond rigorous TDD? Is the regeneration recipe the key addition? Is the slop measurement? Is it the explicit lifecycle?
-
----
-
-## 10. How does regenerable architecture interact with long-running processes and stateful systems?
-
-The pricing discount capsule in this repository is stateless. Regeneration is straightforward.
-
-For capsules that manage long-running workflows, stateful machines, or saga-style coordination, regeneration becomes harder:
-- In-flight workflows may need to complete before regeneration
-- State migration may be required
-- The regeneration recipe must account for state transition edge cases
-
-How do you design regenerable stateful capsules?
+**Still open:** Whether the overhead of the full artifact layer is justified in domains where strong
+TDD is already practiced, or whether a lighter adoption (Levels 1–3 in the maturity model) captures
+most of the value.

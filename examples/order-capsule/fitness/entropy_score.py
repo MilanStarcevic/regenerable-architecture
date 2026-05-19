@@ -1,12 +1,12 @@
 """
-Slop Score — Pricing Discount Capsule
+Entropy Score — Pricing Discount Capsule
 
-Reference implementation of the slop fitness function interface.
+Reference implementation of the implementation entropy fitness function interface.
 See fitness-functions/README.md for the interface specification and tool alternatives.
 
 Usage:
-  python3 fitness/slop_score.py [--verbose]
-  python3 examples/pricing-discount-capsule/fitness/slop_score.py [--verbose]
+  python3 fitness/entropy_score.py [--verbose]
+  python3 examples/pricing-discount-capsule/fitness/entropy_score.py [--verbose]
 """
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def _status(score: int) -> tuple[str, str]:
     return "critical", "urgent regeneration"
 
 
-def compute_slop_score(directory: str | Path, verbose: bool = False) -> dict:
+def compute_entropy_score(directory: str | Path, verbose: bool = False) -> dict:
     directory = Path(directory)
 
     complexity = complexity_check(directory)
@@ -68,8 +68,8 @@ def compute_slop_score(directory: str | Path, verbose: bool = False) -> dict:
         - test_confidence_score
     )
 
-    slop_score = max(0, min(100, round(raw)))
-    status, recommended_action = _status(slop_score)
+    entropy_score = max(0, min(100, round(raw)))
+    status, recommended_action = _status(entropy_score)
 
     result = {
         "complexity_score": complexity_score,
@@ -78,7 +78,7 @@ def compute_slop_score(directory: str | Path, verbose: bool = False) -> dict:
         "semantic_drift_score": semantic_drift_score,
         "changeability_score": changeability_score,
         "test_confidence_score": test_confidence_score,
-        "slop_score": slop_score,
+        "entropy_score": entropy_score,
         "status": status,
         "recommended_action": recommended_action,
     }
@@ -98,12 +98,12 @@ def compute_slop_score(directory: str | Path, verbose: bool = False) -> dict:
 
 if __name__ == "__main__":
     verbose = "--verbose" in sys.argv or "-v" in sys.argv
-    result = compute_slop_score(CAPSULE_DIR, verbose=verbose)
+    result = compute_entropy_score(CAPSULE_DIR, verbose=verbose)
     print(json.dumps(result, indent=2))
 
-    if result["slop_score"] >= REGENERATION_THRESHOLD:
+    if result["entropy_score"] >= REGENERATION_THRESHOLD:
         print(
-            f"\nWARNING: Slop score {result['slop_score']} >= regeneration threshold {REGENERATION_THRESHOLD}.",
+            f"\nWARNING: Entropy score {result['entropy_score']} >= regeneration threshold {REGENERATION_THRESHOLD}.",
             file=sys.stderr,
         )
         print(f"Recommended action: {result['recommended_action']}", file=sys.stderr)

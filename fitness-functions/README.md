@@ -1,20 +1,24 @@
-# Slop Fitness Functions
+# Implementation Entropy Fitness Functions
 
-Fitness functions are automated checks that measure implementation health in a capability capsule. They answer one question: has accumulated slop — complexity, duplication, semantic drift, weak tests — crossed the threshold where regeneration is safer than further refactoring?
+Fitness functions are automated checks that measure implementation health in a capability capsule.
+They answer one question: has accumulated implementation entropy — complexity, duplication, semantic drift, weak tests
+— crossed the threshold where regeneration is safer than further refactoring?
 
 This document defines:
 
 1. **The interface contract** — what any fitness function implementation must produce
-2. **The six slop signals** — what to measure, why it matters, and which existing tools cover it
-3. **The composite slop score** — how signals combine into a regeneration trigger
+2. **The six entropy signals** — what to measure, why it matters, and which existing tools cover it
+3. **The composite entropy score** — how signals combine into a regeneration trigger
 
-The reference Python implementation lives in [examples/pricing-discount-capsule/fitness/](../examples/pricing-discount-capsule/fitness/).
+The reference Python implementation lives in
+[examples/pricing-discount-capsule/fitness/](../examples/pricing-discount-capsule/fitness/).
 
 ---
 
 ## Interface Contract
 
-Each fitness check takes a capsule directory as input and returns a JSON-compatible dict with at minimum a `"score"` key:
+Each fitness check takes a capsule directory as input and returns a JSON-compatible dict with at
+minimum a `"score"` key:
 
 ```json
 {
@@ -22,18 +26,19 @@ Each fitness check takes a capsule directory as input and returns a JSON-compati
 }
 ```
 
-- `score` is a float from 0 (healthy) to 100 (high slop)
+- `score` is a float from 0 (healthy) to 100 (high implementation entropy)
 - Additional keys provide supporting detail for diagnostics
 - Any tool or script that produces this shape satisfies the interface
 
-The composite slop score runner calls each check, combines scores using the formula below, and outputs the aggregate result.
+The composite entropy score runner calls each check, combines scores using the formula below, and
+outputs the aggregate result.
 
 ---
 
-## Slop Score Formula
+## Entropy Score Formula
 
 ```
-Slop Score =
+Entropy Score =
   complexity_score
 + duplication_score
 + dependency_score
@@ -42,7 +47,8 @@ Slop Score =
 - test_confidence_score
 ```
 
-Normalized to 0–100. Test confidence is **subtracted**: strong tests reduce the risk that structural decay has caused undetected behavioral drift.
+Normalized to 0–100. Test confidence is **subtracted**: strong tests reduce the risk that structural
+decay has caused undetected behavioral drift.
 
 | Score | Status | Action |
 |---|---|---|
@@ -52,7 +58,8 @@ Normalized to 0–100. Test confidence is **subtracted**: strong tests reduce th
 | 71–85 | High | Regenerate |
 | 86–100 | Critical | Urgent regeneration |
 
-Thresholds should be calibrated to your team and domain. Start conservative; tighten as your baseline improves.
+Thresholds should be calibrated to your team and domain. Start conservative; tighten as your
+baseline improves.
 
 ---
 
@@ -62,7 +69,9 @@ Thresholds should be calibrated to your team and domain. Start conservative; tig
 
 **What to measure:** Functions too long to reason about, excessive branching, maximum nesting depth.
 
-**Why it matters for regenerability:** AI models generate correct but over-engineered code. Over multiple generations, complexity compounds into implementations that are difficult to verify, modify, or reason about confidently.
+**Why it matters for regenerability:** AI models generate correct but over-engineered code. Over
+multiple generations, complexity compounds into implementations that are difficult to verify,
+modify, or reason about confidently.
 
 **Existing tools:**
 
@@ -81,7 +90,9 @@ Thresholds should be calibrated to your team and domain. Start conservative; tig
 
 **What to measure:** Repeated lines and duplicate code blocks across the capsule.
 
-**Why it matters for regenerability:** AI models generate the same solution in multiple places without recognising the overlap. When a business rule changes, one copy gets updated and the other does not. Neither is authoritative.
+**Why it matters for regenerability:** AI models generate the same solution in multiple places
+without recognising the overlap. When a business rule changes, one copy gets updated and the other
+does not. Neither is authoritative.
 
 **Existing tools:**
 
@@ -96,9 +107,12 @@ Thresholds should be calibrated to your team and domain. Start conservative; tig
 
 ### 3. Dependency Accumulation
 
-**What to measure:** Total import count, external dependency count, presence of unexpectedly heavyweight dependencies.
+**What to measure:** Total import count, external dependency count, presence of unexpectedly
+heavyweight dependencies.
 
-**Why it matters for regenerability:** AI models import libraries freely, often for single-use convenience. Dependency accumulation is difficult to reverse cleanly and increases the surface area of each regeneration.
+**Why it matters for regenerability:** AI models import libraries freely, often for single-use
+convenience. Dependency accumulation is difficult to reverse cleanly and increases the surface area
+of each regeneration.
 
 **Existing tools:**
 
@@ -115,9 +129,13 @@ Thresholds should be calibrated to your team and domain. Start conservative; tig
 
 ### 4. Semantic Drift
 
-**What to measure:** Alignment between the implementation vocabulary and the business domain declared in `intent.md`.
+**What to measure:** Alignment between the implementation vocabulary and the business domain
+declared in `intent.md`.
 
-**Why it matters for regenerability:** Domain terms get renamed across generations — "discount percentage" becomes "rate multiplier," "customer tier" becomes "loyalty level." The code still produces correct results but no longer maps back to the specification. Future regeneration amplifies the drift.
+**Why it matters for regenerability:** Domain terms get renamed across generations — "discount
+percentage" becomes "rate multiplier," "customer tier" becomes "loyalty level." The code still
+produces correct results but no longer maps back to the specification. Future regeneration amplifies
+the drift.
 
 **Existing tools:**
 
@@ -129,15 +147,20 @@ Thresholds should be calibrated to your team and domain. Start conservative; tig
 | Production behavior comparison against golden masters | Any |
 | Term presence check: domain vocabulary from `intent.md` appears in source files | Any (heuristic) |
 
-Semantic drift is the signal most likely to require a custom check or LLM-assisted review regardless of tooling. Heuristic term matching catches obvious drift; it misses subtle reinterpretation of business rules.
+Semantic drift is the signal most likely to require a custom check or LLM-assisted review regardless
+of tooling. Heuristic term matching catches obvious drift; it misses subtle reinterpretation of
+business rules.
 
 ---
 
 ### 5. Test Confidence
 
-**What to measure:** Test count, presence of behavioral acceptance tests, presence of invariant tests, whether the suite currently passes.
+**What to measure:** Test count, presence of behavioral acceptance tests, presence of invariant
+tests, whether the suite currently passes.
 
-**Why it matters for regenerability:** This score is **subtracted** from the composite total. High confidence means regeneration is safer — the behavioral specification is strong enough to catch divergence. Low confidence means regeneration is risky regardless of implementation quality.
+**Why it matters for regenerability:** This score is **subtracted** from the composite total. High
+confidence means regeneration is safer — the behavioral specification is strong enough to catch
+divergence. Low confidence means regeneration is risky regardless of implementation quality.
 
 **Existing tools:**
 
@@ -155,7 +178,8 @@ Semantic drift is the signal most likely to require a custom check or LLM-assist
 
 **What to measure:** Recent churn in git history, TODO/FIXME/HACK comment count.
 
-**Why it matters for regenerability:** High churn may indicate implementation thrashing. Deferred problems marked as TODO or HACK accumulate into regeneration triggers.
+**Why it matters for regenerability:** High churn may indicate implementation thrashing. Deferred
+problems marked as TODO or HACK accumulate into regeneration triggers.
 
 **Existing tools:**
 
@@ -169,7 +193,7 @@ Semantic drift is the signal most likely to require a custom check or LLM-assist
 
 ## Using SonarQube
 
-If your team already runs SonarQube, you can derive an approximate slop score without custom checks:
+If your team already runs SonarQube, you can derive an approximate entropy score without custom checks:
 
 | Signal | SonarQube metric |
 |---|---|
@@ -180,7 +204,8 @@ If your team already runs SonarQube, you can derive an approximate slop score wi
 | Changeability | `code_smells`, normalised |
 | Semantic drift | Not covered — requires custom check or LLM-assisted review |
 
-Semantic drift is the one signal SonarQube does not address. It requires intent documents and a mechanism to verify that implementation vocabulary still matches them.
+Semantic drift is the one signal SonarQube does not address. It requires intent documents and a
+mechanism to verify that implementation vocabulary still matches them.
 
 ---
 
@@ -190,7 +215,7 @@ A working Python implementation of all six checks is included in the example cap
 
 ```
 examples/pricing-discount-capsule/fitness/
-├── slop_score.py           ← composite score runner
+├── entropy_score.py           ← composite score runner
 ├── complexity_check.py
 ├── duplication_check.py
 ├── dependency_check.py
@@ -199,16 +224,17 @@ examples/pricing-discount-capsule/fitness/
 └── changeability_check.py
 ```
 
-These implementations are Python-specific. They satisfy the interface contract above and are intended as a reference when implementing checks for your own stack.
+These implementations are Python-specific. They satisfy the interface contract above and are
+intended as a reference when implementing checks for your own stack.
 
 Run against the example capsule from the repository root:
 
 ```bash
-python3 examples/pricing-discount-capsule/fitness/slop_score.py
+python3 examples/pricing-discount-capsule/fitness/entropy_score.py
 ```
 
 Or from the capsule directory:
 
 ```bash
-python3 fitness/slop_score.py
+python3 fitness/entropy_score.py
 ```

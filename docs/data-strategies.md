@@ -2,21 +2,26 @@
 
 ## The Core Problem
 
-When a system contains many capability capsules—some short-lived, some routinely regenerated—data ownership becomes a critical architectural concern.
+When a system contains many capability capsules—some short-lived, some routinely regenerated—data
+ownership becomes a critical architectural concern.
 
 The naive approach is dangerous:
 
 > Every capsule owns its own canonical database.
 
-This creates **distributed slop**: a system of many small services each with their own canonical data stores, duplicated domain models, inconsistent data semantics, and no clear ownership. When capsules are regenerated, their data may be lost, migrated inconsistently, or orphaned.
+This creates **distributed entropy**: a system of many small services each with their own canonical
+data stores, duplicated domain models, inconsistent data semantics, and no clear ownership. When
+capsules are regenerated, their data may be lost, migrated inconsistently, or orphaned.
 
-This document describes strategies for avoiding distributed slop while preserving the disposability of capability capsules.
+This document describes strategies for avoiding distributed entropy while preserving the disposability
+of capability capsules.
 
 ---
 
 ## Data Classification
 
-Every capsule must classify the data it handles. This classification determines the appropriate ownership and lifecycle strategy.
+Every capsule must classify the data it handles. This classification determines the appropriate
+ownership and lifecycle strategy.
 
 | Class | Description | Lifecycle |
 |---|---|---|
@@ -27,13 +32,15 @@ Every capsule must classify the data it handles. This classification determines 
 | **Configuration** | Governs capsule behavior | Should be externalized from implementation |
 | **Personal/sensitive** | Subject to privacy regulation | Requires lifecycle governance regardless of capsule lifecycle |
 
-Only canonical, audit, and personal/sensitive data require strong ownership discipline. Derived, ephemeral, and configuration data can be treated as part of the disposable layer.
+Only canonical, audit, and personal/sensitive data require strong ownership discipline. Derived,
+ephemeral, and configuration data can be treated as part of the disposable layer.
 
 ---
 
 ## Strategy 1: Durable Domain APIs
 
-Disposable capsules call stable domain APIs for canonical data. The data is owned by the domain, not the capsule.
+Disposable capsules call stable domain APIs for canonical data. The data is owned by the domain, not
+the capsule.
 
 **Use when:**
 - The capsule needs to read or write canonical data
@@ -48,7 +55,8 @@ Discount Capsule → Product API  → Product DB (canonical)
 Discount Capsule → Pricing API  → Pricing DB (canonical)
 ```
 
-The discount capsule is disposable. The customer, product, and pricing domain APIs are durable. Regenerating the discount capsule does not affect canonical data.
+The discount capsule is disposable. The customer, product, and pricing domain APIs are durable.
+Regenerating the discount capsule does not affect canonical data.
 
 **Implementation guidance:**
 - Domain APIs should have explicit versioned contracts
@@ -72,13 +80,15 @@ Expose governed, curated data products for read-heavy or analytical use cases.
 - Quality SLOs (freshness, completeness, accuracy)
 - Discoverable through a data catalog or registry
 
-A data product is not owned by any capsule. It is governed at the domain level and consumed by capsules as a dependency.
+A data product is not owned by any capsule. It is governed at the domain level and consumed by
+capsules as a dependency.
 
 ---
 
 ## Strategy 3: Derived Projections
 
-Capsules may own projections—read-optimized views of canonical data, shaped for the capsule's specific query needs.
+Capsules may own projections—read-optimized views of canonical data, shaped for the capsule's
+specific query needs.
 
 **Use when:**
 - The capsule needs a query shape that does not exist in the domain API
@@ -141,13 +151,15 @@ Capsules can rebuild local state by replaying durable events from an event log.
 - The capsule's event consumer logic is disposable; the event log is not
 - Regenerated capsules can replay from the beginning of the log or from a snapshot
 
-This strategy aligns closely with event sourcing. The event log is the durable artifact; the materialized view is the disposable projection.
+This strategy aligns closely with event sourcing. The event log is the durable artifact; the
+materialized view is the disposable projection.
 
 ---
 
 ## Strategy 6: Shared Canonical Store with Strict Ownership
 
-In smaller systems or modular monoliths, a shared database with module-enforced ownership can be appropriate.
+In smaller systems or modular monoliths, a shared database with module-enforced ownership can be
+appropriate.
 
 **Use when:**
 - The system is small enough that separate databases add overhead without benefit
@@ -159,7 +171,8 @@ In smaller systems or modular monoliths, a shared database with module-enforced 
 - Cross-module queries are tempting and hard to detect
 - Schema migrations require coordination
 
-**Recommendation:** Use this strategy for modular monoliths where module boundaries are enforced by code review, linting, or architectural tests. Avoid it when teams are working independently.
+**Recommendation:** Use this strategy for modular monoliths where module boundaries are enforced by
+code review, linting, or architectural tests. Avoid it when teams are working independently.
 
 ---
 
@@ -200,7 +213,8 @@ If a capsule owns state that may need to survive regeneration or transfer to a d
 - An ownership review escalates the data to canonical status
 - The data is migrated to a durable domain API with an export contract
 
-Without an export contract, capsule regeneration may silently lose data that had accumulated business value.
+Without an export contract, capsule regeneration may silently lose data that had accumulated
+business value.
 
 ---
 
@@ -218,4 +232,5 @@ flowchart TD
     H --> I[Create Migration / Export Contract]
 ```
 
-The core failure mode to avoid — every capsule owning its own canonical database — is described in [docs/anti-patterns.md](anti-patterns.md) under "Distributed Slop."
+The core failure mode to avoid — every capsule owning its own canonical database — is described in
+[docs/anti-patterns.md](anti-patterns.md) under "Distributed Entropy."

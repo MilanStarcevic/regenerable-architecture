@@ -2,30 +2,47 @@
 #
 # System manifest for the regenerable-architecture example system.
 #
-# This is a DURABLE system-level artifact. It declares all capsules and their
-# dependency relationships. Update it when capsules are added, removed, or when
-# dependency relationships change.
+# This is a DURABLE system-level artifact. It declares all capsules, their
+# owners, adoption maturity level, data ownership, and dependency relationships.
+# Update it when capsules are added, removed, re-owned, or when dependency
+# relationships or data classifications change.
 #
 # The manifest enables:
 #   - Dependency graph visibility across capsules
 #   - Impact analysis before a capsule is regenerated
 #   - Safe regeneration sequencing (dependencies before dependents)
 #   - Contract compatibility checks across capsule versions
+#   - Governance visibility: who owns what, at what maturity level
 
 capsules:
 
   - name: pricing-discount-capsule
     path: examples/pricing-discount-capsule
+    owner: pricing-team
+    lifecycle_level: 4          # see docs/adoption-maturity-model.md
     provides: Calculates discount percentage and explanation for a customer basket
     inbound_contract: ports/inbound/openapi.yaml
     inbound_version: "1.0"
+    data_owned:
+      canonical: []             # no canonical data — stateless capsule
+      derived:
+        - discount_result       # computed from basket; safe to discard on regeneration
+      ephemeral: []
     depends_on: []
 
   - name: order-capsule
     path: examples/order-capsule
+    owner: commerce-team
+    lifecycle_level: 3          # see docs/adoption-maturity-model.md
     provides: Places and retrieves customer orders with discount applied
     inbound_contract: ports/inbound/openapi.yaml
     inbound_version: "1.0"
+    data_owned:
+      canonical:
+        - order_record          # authoritative order record; must survive regeneration
+      derived:
+        - discounted_total      # computed from order + discount; rebuildable
+      ephemeral: []
     depends_on:
       - capsule: pricing-discount-capsule
         contract: ports/inbound/openapi.yaml
@@ -33,13 +50,17 @@ capsules:
         operations:
           - calculateDiscount
         why: Determines the discount percentage and explanation before recording an order
+        post_regeneration_checks:
+          - tests/test_integration.py
 
 # Regeneration pre-flight protocol:
 #
 # Before regenerating any capsule:
 #   1. Identify all capsules in depends_on that list this capsule.
-#      Those consumers must re-run test_integration.py after the regeneration.
+#      Those consumers must re-run post_regeneration_checks after the regeneration.
 #   2. Verify the regenerated inbound_contract is compatible with every
 #      consumer's declared version.
 #   3. If multiple capsules need regeneration, regenerate dependencies first
 #      (capsules with empty depends_on), then dependents.
+#   4. Canonical data owned by a regenerating capsule must be migrated or
+#      preserved — it cannot be discarded with the implementation.

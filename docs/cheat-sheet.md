@@ -24,10 +24,11 @@ See [when-not-to-use.md](when-not-to-use.md) for detailed contraindications.
 
 | Score | Meaning | High score means |
 | --- | --- | --- |
-| **Slop score** | How decayed is the implementation? | Regeneration is indicated |
+| **Entropy score** | How decayed is the implementation? | Regeneration is indicated |
 | **Artifact drift score** | How unsafe are the regeneration inputs? | Regeneration is blocked |
 
-Both must be checked before regenerating. High slop with low artifact drift: regenerate. High artifact drift: strengthen artifacts first regardless of slop.
+Both must be checked before regenerating. High entropy with low artifact drift: regenerate. High
+artifact drift: strengthen artifacts first regardless of entropy.
 
 ---
 
@@ -42,7 +43,7 @@ Specify → Generate → Operate → Measure → Regenerate
 | Specify | `intent.md`, contracts, tests, recipe | Is the durable layer complete and consistent? |
 | Generate | `src/` (disposable) | Does the generated implementation pass all behavioral tests? |
 | Operate | Runtime metrics, SLOs | Is the system healthy? |
-| Measure | Slop score, artifact drift score | Is the implementation decaying? Are the artifacts drifting? |
+| Measure | Entropy score, artifact drift score | Is the implementation decaying? Are the artifacts drifting? |
 | Regenerate | New `src/` from durable artifacts | Did the regeneration pass all tests? |
 
 ---
