@@ -44,12 +44,12 @@ recreated:
 ## The Lifecycle
 
 ```
-Specify → Generate → Operate → Measure Slop → Regenerate
+Specify → Generate → Operate → Measure Entropy → Regenerate
 ```
 
 **Specify**: Strengthen durable artifacts — contract first, tests first, intent explicit.
 **Generate**: Produce an implementation from the durable artifacts using the regeneration recipe.
-**Operate**: Run in production. **Measure Slop**: Run fitness functions and compute a entropy score.
+**Operate**: Run in production. **Measure Entropy**: Run fitness functions and compute a entropy score.
 **Regenerate**: When the entropy score crosses the threshold, discard the implementation and
 regenerate. Verify all tests pass.
 
@@ -156,7 +156,7 @@ The two scores interact predictably:
 | Low | High | Artifacts drifted — do not regenerate; strengthen artifacts first |
 | High | High | Most dangerous — regeneration needed but unsafe |
 
-**Durable health must gate regeneration. Slop scores alone do not.**
+**Durable health must gate regeneration. Entropy scores alone do not.**
 
 See [fitness-functions/artifact-drift.md](../fitness-functions/artifact-drift.md) for the full
 signal specification, score formula, and implementation guidance.

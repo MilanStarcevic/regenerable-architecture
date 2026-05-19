@@ -36,6 +36,6 @@ In this demo, these inputs are passed directly to the calculation function for s
 
 ## This Intent Should Survive Regeneration
 
-When this capsule is regenerated—whether due to high slop score, a tooling upgrade, or a requirement change—this document is the source of truth for business intent.
+When this capsule is regenerated—whether due to high entropy score, a tooling upgrade, or a requirement change—this document is the source of truth for business intent.
 
 If there is a conflict between this document and the implementation, this document is correct and the implementation should be fixed.

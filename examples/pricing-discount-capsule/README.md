@@ -47,7 +47,7 @@ Expected result: 43 tests pass across acceptance, invariant, and contract test s
 From the repository root:
 
 ```bash
-python3 examples/pricing-discount-capsule/fitness/slop_score.py
+python3 examples/pricing-discount-capsule/fitness/entropy_score.py
 ```
 
 Or via Make:
@@ -56,7 +56,7 @@ Or via Make:
 make fitness
 ```
 
-Expected result: slop score of 0 (healthy), with `test_confidence_score` of 100 reflecting the comprehensive test coverage.
+Expected result: entropy score of 0 (healthy), with `test_confidence_score` of 100 reflecting the comprehensive test coverage.
 
 The fitness implementation is Python-specific. See [fitness-functions/README.md](../../fitness-functions/README.md) for the language-agnostic interface specification and tool alternatives for other stacks.
 
@@ -82,9 +82,9 @@ print(result)
 
 1. **Specify** — `intent.md` and `contracts/openapi.yaml` were defined before any implementation was written
 2. **Generate** — `src/pricing_discount_service.py` was generated to satisfy the tests and contract
-3. **Operate** — the capsule runs; fitness functions measure slop
-4. **Measure** — `make fitness` produces a composite slop score
-5. **Regenerate** — when slop exceeds the threshold, `regeneration-recipe.md` guides safe regeneration
+3. **Operate** — the capsule runs; fitness functions measure entropy
+4. **Measure** — `make fitness` produces a composite entropy score
+5. **Regenerate** — when entropy exceeds the threshold, `regeneration-recipe.md` guides safe regeneration
 
 ## What Makes This Capsule Regenerable
 

@@ -7,15 +7,15 @@ code. It is not a single bug or a single bad decision. It is the compound effect
 individually defensible choices that together erode the trust, clarity, and maintainability of a
 system.
 
-The term "slop" is deliberately unglamorous. It is not "technical debt" (too neutral), not "code
-smell" (too narrow), and not "AI hallucination" (a different problem). Slop is what happens when
+The term "implementation entropy" is deliberately precise. It is not "technical debt" (too neutral), not "code
+smell" (too narrow), and not "AI hallucination" (a different problem). Implementation entropy is what happens when
 generated code is accepted and evolved without architectural discipline: the right tests in the
 wrong places, the right behavior under the wrong name, the right logic duplicated across the wrong
 contexts.
 
 ---
 
-## How Slop Accumulates
+## How Implementation Entropy Accumulates
 
 ### Pattern 1: Complexity Without Purpose
 
@@ -68,9 +68,9 @@ not tested against the business requirement, and may survive into regenerations 
 
 ---
 
-## Measuring Slop
+## Measuring Implementation Entropy
 
-Slop is measurable through six signals: complexity, duplication, dependency accumulation, semantic
+Implementation entropy is measurable through six signals: complexity, duplication, dependency accumulation, semantic
 drift, test confidence, and changeability. Test confidence is subtracted from the composite total —
 strong tests mean regeneration is safer regardless of structural decay. See
 [fitness-functions/README.md](../fitness-functions/README.md) for the formula, thresholds, and tool
@@ -78,13 +78,13 @@ alternatives for each signal.
 
 ---
 
-## What Slop Is Not
+## What Implementation Entropy Is Not
 
-- **A bug.** Slop can exist in code with no observable bugs.
-- **A style violation.** Slop is not about formatting or naming conventions.
-- **A performance problem.** Slop can exist in fast code.
-- **Intentional complexity.** Well-documented complexity serving a genuine purpose is not slop.
-- **All AI-generated code.** Many AI-generated implementations are clean and appropriate. Slop is a decay pattern, not an inherent property of generation.
+- **A bug.** Implementation entropy can exist in code with no observable bugs.
+- **A style violation.** Implementation entropy is not about formatting or naming conventions.
+- **A performance problem.** Implementation entropy can exist in fast code.
+- **Intentional complexity.** Well-documented complexity serving a genuine purpose is not implementation entropy.
+- **All AI-generated code.** Many AI-generated implementations are clean and appropriate. Implementation entropy is a decay pattern, not an inherent property of generation.
 
-Slop is specifically the accumulated implementation decay that makes a system harder to understand,
+Implementation entropy is specifically the accumulated implementation decay that makes a system harder to understand,
 trust, and regenerate safely.

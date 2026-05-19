@@ -6,7 +6,7 @@ This document tells an AI coding tool—or a developer—how to regenerate `src/
 
 Use this recipe when:
 
-- The slop score for this capsule exceeds the regeneration threshold (default: 71)
+- The entropy score for this capsule exceeds the regeneration threshold (default: 71)
 - A significant requirement change makes the current implementation a poor foundation
 - The implementation has drifted from intent broadly enough that targeted editing is riskier than a clean start
 - The generation tooling has improved and a fresh generation would produce meaningfully better code
@@ -24,7 +24,7 @@ Before regenerating:
 - [ ] `tests/test_invariants.py` covers all invariants (final total non-negative, discount applied once)
 - [ ] `tests/test_integration.py` passes against the real pricing-discount-capsule
 - [ ] All tests pass against the current implementation
-- [ ] The slop score has been recorded for comparison after regeneration
+- [ ] The entropy score has been recorded for comparison after regeneration
 
 Additionally, verify system-level safety before regenerating:
 
@@ -59,12 +59,12 @@ Regenerate `src/order_service.py` from:
 
 7. **All tests must pass.** `python3 -m pytest examples/order-capsule/tests/` must complete with zero failures.
 
-8. **Slop score must remain below threshold.** Run `python3 fitness/slop_score.py` from the capsule directory and confirm the score is below 50.
+8. **Entropy score must remain below threshold.** Run `python3 fitness/entropy_score.py` from the capsule directory and confirm the score is below 50.
 
 ## Post-Regeneration Verification
 
 1. Run `python3 -m pytest examples/order-capsule/tests/` — all tests must pass, including `test_integration.py`
-2. Run `python3 fitness/slop_score.py` from the capsule directory — score must be below threshold
+2. Run `python3 fitness/entropy_score.py` from the capsule directory — score must be below threshold
 3. Read the new implementation against `intent.md` and confirm the vocabulary matches
 4. Confirm the `discount_service` parameter is the only point of contact with the pricing-discount-capsule
 
@@ -100,7 +100,7 @@ Do not add features or behaviour beyond what the tests and intent.md require.
 The capsule is in a known good state when:
 
 - All tests pass, including integration tests
-- Slop score is below 30
+- Entropy score is below 30
 - The implementation vocabulary matches `intent.md` — "order", "basket", "discount", "final", "total", "explanation", "items", "campaign"
 - The `discount_service` parameter is the only reference to the pricing-discount-capsule in the implementation
 - The implementation can be read and understood in under 10 minutes

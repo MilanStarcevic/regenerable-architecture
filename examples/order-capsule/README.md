@@ -50,7 +50,7 @@ python3 -m pytest examples/order-capsule/tests/ -v
 ## Running the Fitness Functions
 
 ```bash
-python3 examples/order-capsule/fitness/slop_score.py
+python3 examples/order-capsule/fitness/entropy_score.py
 ```
 
 ## How the Outbound Port Works

@@ -70,7 +70,7 @@ Wait until the domain model stabilizes before applying capsule structure.
 
 ### Teams that will not run fitness functions with real thresholds
 
-Measuring slop and never acting on it is fitness function theater (see
+Measuring implementation entropy and never acting on it is fitness function theater (see
 [anti-patterns.md](anti-patterns.md)). If the organizational context does not support treating a
 high entropy score as a genuine trigger for regeneration, the measurement layer is overhead without
 benefit. In that context, invest in ordinary code quality practices instead.

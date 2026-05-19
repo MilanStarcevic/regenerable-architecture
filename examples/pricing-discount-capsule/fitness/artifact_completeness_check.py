@@ -4,7 +4,7 @@ See fitness-functions/artifact-drift.md for the interface contract.
 
 Verifies that all required durable artifacts are present in the capsule.
 A capsule missing any of these cannot be safely regenerated regardless of
-its implementation slop score.
+its implementation entropy score.
 
 Returns a score of 0 (all present) to 100 (all missing).
 """

@@ -4,7 +4,7 @@ See fitness-functions/README.md for the interface contract and tool alternatives
 
 Measures test suite quality as a guide for safe regeneration.
 Returns a score from 0 (no confidence) to 100 (high confidence).
-Higher is better — this score is SUBTRACTED from the slop total.
+Higher is better — this score is SUBTRACTED from the entropy total.
 """
 from __future__ import annotations
 

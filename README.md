@@ -190,7 +190,7 @@ See [docs/implementation-entropy.md](docs/implementation-entropy.md) for a detai
 The architecture includes two complementary sets of fitness functions. Both use the same interface
 contract and can be run from the same runner.
 
-### Implementation Fitness (Slop)
+### Implementation Fitness
 
 Measures whether the implementation layer has decayed to the point where regeneration is safer than
 further refactoring.
@@ -207,7 +207,7 @@ Entropy Score =
 - test_confidence_score
 ```
 
-Normalized to 0–100. Test confidence is subtracted because strong tests reduce the risk that slop
+Normalized to 0–100. Test confidence is subtracted because strong tests reduce the risk that entropy
 has caused undetected behavioral drift.
 
 | Score | Status | Recommended Action |
@@ -230,14 +230,14 @@ reference Python implementation is in
 
 Measures whether the durable artifacts themselves are internally consistent — whether intent, tests,
 contracts, stubs, and the regeneration recipe still describe the same capsule. A capsule with low
-slop but a high artifact drift score is unsafe to regenerate: the regenerated implementation will be
+entropy but a high artifact drift score is unsafe to regenerate: the regenerated implementation will be
 guided by inconsistent artifacts and will fail in ways the tests do not catch.
 
 Artifact drift checks run in two tiers: mechanical checks (file integrity, contract coverage, stub
 consistency) run continuously in CI; LLM-assisted checks (intent-test alignment, contract-intent
 alignment, recipe currency) run as a pre-regeneration gate.
 
-**Artifact drift must gate regeneration. Slop scores alone do not.**
+**Artifact drift must gate regeneration. Entropy scores alone do not.**
 
 See [fitness-functions/artifact-drift.md](fitness-functions/artifact-drift.md) for the full
 specification.
@@ -383,7 +383,7 @@ regenerable-architecture/
 │       ├── fitness/
 │       └── README.md
 ├── fitness-functions/
-│   ├── README.md                ← slop signal spec and tool alternatives (language-agnostic)
+│   ├── README.md                ← entropy signal spec and tool alternatives (language-agnostic)
 │   └── artifact-drift.md        ← artifact drift signal spec and interface contract
 ├── scripts/
 │   ├── run-fitness.sh
@@ -484,7 +484,7 @@ none addresses on its own.
 | Concept | Relationship |
 |---|---|
 | Evolutionary architecture | Parent concept; RA specializes it for AI-generated code and adds regeneration as a first-class event |
-| Architecture fitness functions | Used directly as the slop measurement mechanism |
+| Architecture fitness functions | Used directly as the entropy measurement mechanism |
 | Contract-first development | Contracts are elevated from a design technique to a durable artifact |
 | Consumer-driven contracts | Informs why outbound port declarations must represent genuine consumer commitments |
 | Hexagonal architecture (ports and adapters) | Inbound/outbound port structure maps directly; adapters are disposable, ports are durable |
@@ -507,7 +507,7 @@ genuinely new in the synthesis.
 
 Full descriptions in [docs/anti-patterns.md](docs/anti-patterns.md). Key failure modes:
 
-- **Distributed slop** — every capsule owns a canonical database; data conflicts become unresolvable
+- **Distributed entropy** — every capsule owns a canonical database; data conflicts become unresolvable
 - **Prompt as specification** — the original prompt is treated as sufficient documentation; regeneration fails
 - **Regeneration without tests** — deleting and rebuilding code without strong behavioral tests is just risky rewriting
 - **Contract drift** — implementation changes behavior without updating the public contract

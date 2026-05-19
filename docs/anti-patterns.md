@@ -142,7 +142,7 @@ on the results requires operational commitment. The measurement infrastructure i
 process infrastructure to respond.
 
 **Consequences:**
-- Slop accumulates without triggering any action
+- Implementation entropy accumulates without triggering any action
 - The architecture has the appearance of discipline without the substance
 - When a crisis occurs, the fitness functions are discovered to be miscalibrated
 

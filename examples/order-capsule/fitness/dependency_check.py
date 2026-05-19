@@ -25,7 +25,7 @@ STDLIB_MODULES = {
 KNOWN_TEST_DEPS = {"pytest", "pytest_cov", "coverage", "hypothesis", "factory_boy"}
 
 KNOWN_FITNESS_MODULES = {
-    "slop_score", "complexity_check", "duplication_check", "dependency_check",
+    "entropy_score", "complexity_check", "duplication_check", "dependency_check",
     "test_confidence_check", "semantic_drift_check", "changeability_check",
 }
 

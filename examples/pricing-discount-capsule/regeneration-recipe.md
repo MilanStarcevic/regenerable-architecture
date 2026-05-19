@@ -6,7 +6,7 @@ This document tells an AI coding tool—or a developer—how to regenerate `src/
 
 Use this recipe when:
 
-- The slop score for this capsule exceeds the regeneration threshold (default: 71)
+- The entropy score for this capsule exceeds the regeneration threshold (default: 71)
 - A significant requirement change makes the current implementation a poor foundation
 - The implementation has drifted from intent broadly enough that targeted editing is riskier than a clean start
 - The generation tooling has improved and a fresh generation would produce meaningfully better code
@@ -22,7 +22,7 @@ Before regenerating:
 - [ ] `tests/test_acceptance.py` covers all behaviors described in `intent.md`
 - [ ] `tests/test_invariants.py` covers all invariants (max cap, no negative discount)
 - [ ] All tests pass against the current implementation
-- [ ] The slop score has been recorded for comparison after regeneration
+- [ ] The entropy score has been recorded for comparison after regeneration
 
 ## Source Artifacts
 
@@ -47,12 +47,12 @@ Regenerate `src/pricing_discount_service.py` from:
 
 5. **All tests must pass.** `python3 -m pytest examples/pricing-discount-capsule/tests/` must complete with zero failures.
 
-6. **Slop score must remain below threshold.** Run `python3 fitness/slop_score.py` and confirm the score is below 50.
+6. **Entropy score must remain below threshold.** Run `python3 fitness/entropy_score.py` and confirm the score is below 50.
 
 ## Post-Regeneration Verification
 
 1. Run `python3 -m pytest examples/pricing-discount-capsule/tests/` — all tests must pass
-2. Run `python3 fitness/slop_score.py` — score must be below threshold
+2. Run `python3 fitness/entropy_score.py` — score must be below threshold
 3. Read the new implementation against `intent.md` and confirm the vocabulary matches
 4. Confirm the explanation strings in the output match the rules described in `intent.md`
 
@@ -86,6 +86,6 @@ Do not add features or behavior beyond what the tests and intent.md require.
 The capsule is in a known good state when:
 
 - All tests pass
-- Slop score is below 30
+- Entropy score is below 30
 - The implementation vocabulary matches `intent.md` — "discount", "tier", "basket", "campaign", "explanation", "maximum"
 - The implementation can be read and understood in under 10 minutes

@@ -109,7 +109,7 @@ master belongs in the durable layer; the implementation it tested does not.
 The novelty is the synthesis of these ideas into a coherent lifecycle for AI-assisted development:
 
 ```
-Specify → Generate → Operate → Measure Slop → Regenerate
+Specify → Generate → Operate → Measure Entropy → Regenerate
 ```
 
 Five things distinguish this synthesis from any single ingredient:

@@ -85,7 +85,7 @@ Normalized to 0–100. All signals are additive penalties: a score of 0 means al
 
 | Score | Status | Action |
 | --- | --- | --- |
-| 0 | Fully consistent | Regeneration safe (subject to slop threshold) |
+| 0 | Fully consistent | Regeneration safe (subject to entropy threshold) |
 | 1–15 | Minor drift | Investigate and resolve before next regeneration |
 | 16–30 | Moderate drift | Resolve before regenerating; do not regenerate until addressed |
 | 31–100 | Severe drift | Regeneration unsafe; strengthen durable artifacts first |
@@ -264,7 +264,7 @@ current durable artifacts.
 
 ---
 
-## Relationship to Slop Fitness
+## Relationship to Implementation Entropy Fitness
 
 The two scores measure orthogonal things and should be read together, not averaged.
 
@@ -276,12 +276,12 @@ The two scores measure orthogonal things and should be read together, not averag
 | High | High | Most dangerous state. Regeneration is needed but unsafe. Strengthen durable artifacts first, then regenerate. |
 
 The high implementation entropy / high artifact drift case is the failure mode the architecture most needs to protect
-against. An undisciplined team facing this condition is tempted to regenerate because the slop is
+against. An undisciplined team facing this condition is tempted to regenerate because the entropy is
 high. The regeneration fails silently: a new, clean implementation guided by inconsistent artifacts.
 The result is an implementation that passes old tests, satisfies a drifted contract, and does not
 match current business intent.
 
-**Artifact drift must gate regeneration. Slop scores alone do not.**
+**Artifact drift must gate regeneration. Entropy scores alone do not.**
 
 ---
 
