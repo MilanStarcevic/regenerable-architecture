@@ -52,15 +52,3 @@ Wait until the domain model stabilizes before applying capsule structure.
 
 Measuring slop and never acting on it is fitness function theater (see [anti-patterns.md](anti-patterns.md)). If the organizational context does not support treating a high slop score as a genuine trigger for regeneration, the measurement layer is overhead without benefit. In that context, invest in ordinary code quality practices instead.
 
----
-
-## A Diagnostic Test
-
-Before applying Regenerable Architecture to a capsule, ask:
-
-1. Can you write a clear, honest `intent.md` that a competent engineer would agree with?
-2. Do you have, or can you write, behavioral tests that would catch a behavioral regression in a regenerated implementation?
-3. Is there a realistic chance this capsule will need to be regenerated — either because AI slop will accumulate, or because the implementation will become too complex to refactor safely?
-4. Is there an owner who will maintain the durable artifacts as the domain evolves?
-
-If the answer to any of these is no, address that constraint first — or apply a lighter-weight pattern.
