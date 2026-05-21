@@ -1,21 +1,21 @@
-# AI Implementation Entropy: Definition and Detection
+# AI Implementation Decay: Definition and Detection
 
-## What Is AI Implementation Entropy?
+## What Is AI Implementation Decay?
 
-AI implementation entropy is the gradual accumulation of implementation quality decay in AI-generated or AI-assisted
+AI implementation decay is the gradual accumulation of implementation quality degradation in AI-generated or AI-assisted
 code. It is not a single bug or a single bad decision. It is the compound effect of many small,
 individually defensible choices that together erode the trust, clarity, and maintainability of a
 system.
 
-The term "implementation entropy" is deliberately precise. It is not "technical debt" (too neutral), not "code
-smell" (too narrow), and not "AI hallucination" (a different problem). Implementation entropy is what happens when
+The term "implementation decay" is deliberately precise. It is not "technical debt" (too neutral), not "code
+smell" (too narrow), and not "AI hallucination" (a different problem). Implementation decay is what happens when
 generated code is accepted and evolved without architectural discipline: the right tests in the
 wrong places, the right behavior under the wrong name, the right logic duplicated across the wrong
 contexts.
 
 ---
 
-## How Implementation Entropy Accumulates
+## How Implementation Decay Accumulates
 
 ### Pattern 1: Complexity Without Purpose
 
@@ -68,23 +68,25 @@ not tested against the business requirement, and may survive into regenerations 
 
 ---
 
-## Measuring Implementation Entropy
+## Measuring Implementation Decay
 
-Implementation entropy is measurable through six signals: complexity, duplication, dependency accumulation, semantic
-drift, test confidence, and changeability. Test confidence is subtracted from the composite total —
-strong tests mean regeneration is safer regardless of structural decay. See
-[fitness-functions/README.md](../fitness-functions/README.md) for the formula, thresholds, and tool
-alternatives for each signal.
+Implementation decay is measurable through five mechanical signals — complexity, duplication,
+dependency accumulation, test confidence, and changeability — plus one judgment signal: semantic
+drift. Each signal carries its own status (`healthy`, `watch`, `warning`, `critical`); they do not
+combine into a single number. A signal dashboard presents them side by side, and a policy over the
+dashboard determines when regeneration is indicated. See
+[fitness-functions/README.md](../fitness-functions/README.md) for the signal specifications,
+per-signal status descriptions, and tool alternatives for each signal.
 
 ---
 
-## What Implementation Entropy Is Not
+## What Implementation Decay Is Not
 
-- **A bug.** Implementation entropy can exist in code with no observable bugs.
-- **A style violation.** Implementation entropy is not about formatting or naming conventions.
-- **A performance problem.** Implementation entropy can exist in fast code.
-- **Intentional complexity.** Well-documented complexity serving a genuine purpose is not implementation entropy.
-- **All AI-generated code.** Many AI-generated implementations are clean and appropriate. Implementation entropy is a decay pattern, not an inherent property of generation.
+- **A bug.** Implementation decay can exist in code with no observable bugs.
+- **A style violation.** Implementation decay is not about formatting or naming conventions.
+- **A performance problem.** Implementation decay can exist in fast code.
+- **Intentional complexity.** Well-documented complexity serving a genuine purpose is not implementation decay.
+- **All AI-generated code.** Many AI-generated implementations are clean and appropriate. Implementation decay is a decay pattern, not an inherent property of generation.
 
-Implementation entropy is specifically the accumulated implementation decay that makes a system harder to understand,
+Implementation decay is specifically the accumulated degradation that makes a system harder to understand,
 trust, and regenerate safely.

@@ -2,7 +2,7 @@
 Order Service — generated implementation.
 
 This file is the DISPOSABLE layer of the order-capsule.
-It may be regenerated when the entropy score exceeds the configured threshold.
+It may be regenerated when the signal dashboard indicates regeneration.
 
 Durable artifacts that govern this implementation:
   - ../intent.md

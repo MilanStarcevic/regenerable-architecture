@@ -20,15 +20,15 @@ See [when-not-to-use.md](when-not-to-use.md) for detailed contraindications.
 
 ---
 
-## The two scores
+## The two measures
 
-| Score | Meaning | High score means |
+| Measure | Meaning | Bad state means |
 | --- | --- | --- |
-| **Entropy score** | How decayed is the implementation? | Regeneration is indicated |
+| **Signal dashboard** | How decayed is the implementation? (5 mechanical signals + 1 judgment signal) | Regeneration is indicated |
 | **Artifact drift score** | How unsafe are the regeneration inputs? | Regeneration is blocked |
 
-Both must be checked before regenerating. High entropy with low artifact drift: regenerate. High
-artifact drift: strengthen artifacts first regardless of entropy.
+Both must be checked before regenerating. Dashboard indicates regeneration, artifact drift is low:
+regenerate. Artifact drift is high: strengthen artifacts first regardless of dashboard status.
 
 ---
 
@@ -43,7 +43,7 @@ Specify → Generate → Operate → Measure → Regenerate
 | Specify | `intent.md`, contracts, tests, recipe | Is the durable layer complete and consistent? |
 | Generate | `src/` (disposable) | Does the generated implementation pass all behavioral tests? |
 | Operate | Runtime metrics, SLOs | Is the system healthy? |
-| Measure | Entropy score, artifact drift score | Is the implementation decaying? Are the artifacts drifting? |
+| Measure | Signal dashboard, artifact drift score | Is the implementation decaying? Are the artifacts drifting? |
 | Regenerate | New `src/` from durable artifacts | Did the regeneration pass all tests? |
 
 ---

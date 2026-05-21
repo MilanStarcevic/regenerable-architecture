@@ -24,7 +24,7 @@ discard and recreate when it has decayed beyond what targeted change can fix.
 
 Fitness functions—automated checks that evaluate whether a system meets defined architectural
 goals—are the core measurement mechanism in regenerable architecture. This is not new. What is new
-is applying fitness functions to AI entropy signals specifically: complexity accumulation, semantic
+is applying fitness functions to AI implementation decay signals specifically: complexity accumulation, semantic
 drift, dependency growth, and test confidence as a composite trigger for regeneration.
 
 ### Contract-First Development
@@ -109,13 +109,13 @@ master belongs in the durable layer; the implementation it tested does not.
 The novelty is the synthesis of these ideas into a coherent lifecycle for AI-assisted development:
 
 ```
-Specify → Generate → Operate → Measure Entropy → Regenerate
+Specify → Generate → Operate → Measure Decay Signals → Regenerate
 ```
 
-Five things distinguish this synthesis from any single ingredient:
+Six things distinguish this synthesis from any single ingredient:
 
-**1. AI implementation entropy as a named, measurable phenomenon.** The specific failure mode of AI-generated
-implementation decay—complexity accumulation, semantic drift, duplicated patterns, test drift—is not
+**1. AI implementation decay as a named, measurable phenomenon.** The specific failure mode of AI-generated
+code—complexity accumulation, semantic drift, duplicated patterns, test drift—is not
 well-addressed by existing architectural frameworks. Naming it and making it measurable is a
 prerequisite for acting on it systematically.
 
@@ -124,10 +124,12 @@ as failure or last resort. Regenerable Architecture treats it as a normal, tool-
 the system is designed to support from the start. The question is not whether to regenerate but
 when.
 
-**3. The entropy score as a composite regeneration trigger.** Combining complexity, duplication,
-dependency growth, semantic drift, and test confidence into a single signal that determines whether
-to refactor or regenerate is a new mechanism. The individual checks are not new; the composite
-trigger for regeneration decisions is.
+**3. The signal dashboard as a regeneration trigger.** Presenting complexity, duplication,
+dependency growth, test confidence, and changeability as independent signals — each with its own
+status — and triggering regeneration by policy over the dashboard rather than by a composite number
+is a new mechanism. The individual checks are not new; the dashboard-based trigger for regeneration
+decisions is. Semantic drift is evaluated separately as a judgment signal at the pre-regeneration
+gate, where it can be assessed with LLM-assisted review rather than heuristics.
 
 **4. The capability capsule as the unit of knowledge preservation.** The capsule bundles everything
 needed to specify, generate, and regenerate a single capability: intent, contract, tests, fitness
@@ -138,4 +140,12 @@ self-describing, regenerable unit.
 for how to use AI tools to recreate a specific implementation from durable artifacts are not part of
 any existing architectural framework. The recipe is what makes regeneration repeatable rather than
 ad hoc.
+
+**6. LLM-judged semantic drift as a versioned, auditable check.** Using an LLM to compare an
+implementation against its `intent.md` — with a versioned prompt that is itself a durable artifact —
+is a new mechanism for detecting behavioral drift. The evaluating LLM is not grading itself; it is
+comparing a specific implementation against a specification that predates it. The structured output
+schema (drift findings, severity, confidence, rationale) makes the assessment auditable. A change
+to the evaluation prompt is treated as an architecture change, reviewed with the same rigor as a
+change to `intent.md` or the inbound contract.
 

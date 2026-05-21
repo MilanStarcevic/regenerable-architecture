@@ -22,7 +22,7 @@ contracts.
 
 **What it enables:** Fast initial generation.
 
-**Risk:** AI implementation entropy accumulates invisibly. There is no mechanism to detect decay, and no safe path to
+**Risk:** AI implementation decay accumulates invisibly. There is no mechanism to detect it, and no safe path to
 regeneration.
 
 ---
@@ -106,8 +106,8 @@ routine.
 
 ## Level 5 — Active Regeneration Lifecycle
 
-**What the team has added:** Regeneration is a routine event, not an emergency. Entropy score
-thresholds trigger regeneration reviews. The team has regenerated capsules and observed that the
+**What the team has added:** Regeneration is a routine event, not an emergency. Signal dashboard warnings
+trigger regeneration reviews. The team has regenerated capsules and observed that the
 results are correct. Durable health fitness is part of the CI pipeline. The adoption maturity model
 is not a goal — it is a reference for onboarding.
 
@@ -116,7 +116,7 @@ indefinitely because there is a safe exit: discard and recreate. The team can ad
 new generation approaches by updating the recipe, not by migrating the codebase.
 
 **What it looks like in practice:**
-- Entropy scores above the warning threshold trigger a regeneration review in the team's normal cadence
+- Signal dashboard warnings trigger a regeneration review in the team's normal cadence
 - Regeneration readiness checklist is completed as part of any planned regeneration
 - Capsule assessment checklist is used when proposing new capsule boundaries
 - Durable artifacts are updated in the same change set as behavioral changes
@@ -143,7 +143,7 @@ new generation approaches by updating the recipe, not by migrating the codebase.
 | Level 1 | Intent documents written once, never updated — see [Durable Artifact Neglect](anti-patterns.md) |
 | Level 2 | Contracts defined after implementation, reverse-engineered from code |
 | Level 3 | Tests written against implementation internals, break on regeneration |
-| Level 4 | Fitness functions measure entropy but thresholds are never acted on — see [Fitness Function Theater](anti-patterns.md) |
+| Level 4 | Fitness functions measure decay signals but thresholds are never acted on — see [Fitness Function Theater](anti-patterns.md) |
 | Level 5 | Regeneration readiness not verified before regenerating — see [Regeneration Without Tests](anti-patterns.md) |
 
 ---
@@ -152,7 +152,7 @@ new generation approaches by updating the recipe, not by migrating the codebase.
 
 Teams often reach Level 3 in some capsules and Level 0 in others. That is normal. The maturity model
 applies at the capsule level, not the system level. A team may choose to apply full lifecycle
-discipline only to the capsules where AI implementation entropy is most likely to accumulate or where the cost of
+discipline only to the capsules where AI implementation decay is most likely to accumulate or where the cost of
 behavioral regression is highest.
 
 The pattern does not require uniform adoption. It requires that wherever it is applied, the

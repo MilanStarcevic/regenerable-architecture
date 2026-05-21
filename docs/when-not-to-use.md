@@ -5,6 +5,20 @@ rigor as code, fitness functions must be run and acted on, and every regeneratio
 suite strong enough to verify correctness. That overhead is justified when it solves a real problem.
 It is waste when it does not.
 
+The pattern is **overhead-positive** when: the system is large enough and AI-generated enough that
+regeneration amortizes the documentation discipline; the domain is stable enough that durable
+artifacts stay current without constant revision; and the team has the capacity and commitment to
+maintain the durable layer as business rules evolve.
+
+The pattern is **overhead-negative** when: the team is small enough that a single engineer holds
+the full system in memory; the product is in early discovery and the intent itself changes weekly;
+regeneration is rare because the codebase is small and easily rewritten; or AI tools are used
+lightly enough that decay accumulates slowly.
+
+See [docs/cost-and-overhead.md](cost-and-overhead.md) for a detailed treatment.
+
+---
+
 ---
 
 ## Contraindications
@@ -70,8 +84,8 @@ Wait until the domain model stabilizes before applying capsule structure.
 
 ### Teams that will not run fitness functions with real thresholds
 
-Measuring implementation entropy and never acting on it is fitness function theater (see
+Measuring implementation decay signals and never acting on them is fitness function theater (see
 [anti-patterns.md](anti-patterns.md)). If the organizational context does not support treating a
-high entropy score as a genuine trigger for regeneration, the measurement layer is overhead without
+dashboard that indicates regeneration as a genuine trigger, the measurement layer is overhead without
 benefit. In that context, invest in ordinary code quality practices instead.
 

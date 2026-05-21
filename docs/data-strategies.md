@@ -9,11 +9,11 @@ The naive approach is dangerous:
 
 > Every capsule owns its own canonical database.
 
-This creates **distributed entropy**: a system of many small services each with their own canonical
+This creates **distributed data ownership**: a system of many small services each with their own canonical
 data stores, duplicated domain models, inconsistent data semantics, and no clear ownership. When
 capsules are regenerated, their data may be lost, migrated inconsistently, or orphaned.
 
-This document describes strategies for avoiding distributed entropy while preserving the disposability
+This document describes strategies for avoiding distributed data ownership while preserving the disposability
 of capability capsules.
 
 ---
@@ -233,4 +233,4 @@ flowchart TD
 ```
 
 The core failure mode to avoid — every capsule owning its own canonical database — is described in
-[docs/anti-patterns.md](anti-patterns.md) under "Distributed Entropy."
+[docs/anti-patterns.md](anti-patterns.md) under "Distributed Data Ownership."

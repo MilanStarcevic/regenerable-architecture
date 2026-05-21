@@ -8,10 +8,10 @@ test:
 
 fitness:
 	@echo "--- pricing-discount-capsule ---"
-	python3 examples/pricing-discount-capsule/fitness/entropy_score.py
+	python3 examples/pricing-discount-capsule/fitness/decay_dashboard.py
 	@echo ""
 	@echo "--- order-capsule ---"
-	python3 examples/order-capsule/fitness/entropy_score.py
+	python3 examples/order-capsule/fitness/decay_dashboard.py
 
 demo:
 	@echo "=== Regenerable Architecture Demo ==="

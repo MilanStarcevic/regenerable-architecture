@@ -67,7 +67,7 @@ echo "  All tests passed."
 
 echo ""
 echo "Step 5: Run fitness functions to verify health"
-python3 "$CAPSULE/fitness/entropy_score.py"
+python3 "$CAPSULE/fitness/decay_dashboard.py"
 
 echo ""
 echo "=== Regeneration complete ==="

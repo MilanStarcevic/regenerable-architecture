@@ -76,7 +76,7 @@ in isolation and cannot be safely regenerated when dependencies evolve.
 - [ ] The capsule's data lifecycle is compatible with its regeneration lifecycle
 
 **Failure mode:** A capsule whose disposable implementation owns canonical data will lose that data
-on regeneration (see [anti-patterns.md — Distributed Entropy](anti-patterns.md) and
+on regeneration (see [anti-patterns.md — Distributed Data Ownership](anti-patterns.md) and
 [data-strategies.md](data-strategies.md)).
 
 ---

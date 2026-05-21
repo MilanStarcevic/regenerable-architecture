@@ -9,12 +9,12 @@ in practice or just looks good on paper.
 ## 1. How do fitness function thresholds evolve as systems mature?
 
 Initial thresholds are calibrated against a naive baseline. As teams progress through the adoption
-maturity levels, their baseline shifts. Should thresholds tighten over time?
+maturity levels, their baseline shifts. Should per-signal thresholds tighten over time?
 
-A team that consistently achieves an entropy score of 10 should probably recalibrate their threshold
-from 50 to 25 — otherwise the fitness function loses its signal. The adoption maturity model
-([docs/adoption-maturity-model.md](adoption-maturity-model.md)) describes the advancement signals,
-but does not prescribe threshold recalibration.
+A team whose mechanical signals are consistently at the lower end of `watch` should probably
+recalibrate their `watch`/`warning` boundary — otherwise the signal loses its meaning. The adoption
+maturity model ([docs/adoption-maturity-model.md](adoption-maturity-model.md)) describes advancement
+signals but does not prescribe threshold recalibration.
 
 **Still open for architects:**
 
@@ -51,7 +51,7 @@ The additions beyond TDD:
 
 - **Explicit lifecycle:** the *specify → generate → operate → measure → regenerate* cycle is a
   first-class concern, not a developer practice.
-- **Dual-score measurement:** entropy score (implementation decay) and artifact drift score (spec
+- **Dual measurement:** signal dashboard (implementation decay) and artifact drift score (spec
   consistency) together provide a regeneration gate that test coverage alone does not.
 - **Structured artifact layer:** `intent.md`, regeneration recipe, and `system.yaml` preserve the
   knowledge needed to recreate the implementation — not just verify it.

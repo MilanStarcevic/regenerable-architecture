@@ -1,5 +1,12 @@
 # Pricing Discount Capsule
 
+**Role in the two-capsule pair:** Minimal leaf capsule. No outbound dependencies. This is the
+simpler of the two examples and the right starting point. It shows what the artifact layout looks
+like without the complexity of outbound ports or integration tests. It does not show how the system
+manifest or cross-capsule dependency handling work — see the order-capsule for that.
+
+---
+
 A working example of a **capability capsule** in Regenerable Architecture.
 
 This capsule calculates the discount percentage for a customer basket. It is intentionally simple—the point is to demonstrate the architectural lifecycle, not business complexity. A capsule in a real system would have the same structure but more sophisticated behavior.
@@ -47,7 +54,7 @@ Expected result: 43 tests pass across acceptance, invariant, and contract test s
 From the repository root:
 
 ```bash
-python3 examples/pricing-discount-capsule/fitness/entropy_score.py
+python3 examples/pricing-discount-capsule/fitness/decay_dashboard.py
 ```
 
 Or via Make:
@@ -56,7 +63,8 @@ Or via Make:
 make fitness
 ```
 
-Expected result: entropy score of 0 (healthy), with `test_confidence_score` of 100 reflecting the comprehensive test coverage.
+Expected result: all six signals at `healthy` status, `regeneration_indicated: false`, with
+`test_confidence` raw score of 100 reflecting the comprehensive test coverage.
 
 The fitness implementation is Python-specific. See [fitness-functions/README.md](../../fitness-functions/README.md) for the language-agnostic interface specification and tool alternatives for other stacks.
 
@@ -82,9 +90,9 @@ print(result)
 
 1. **Specify** — `intent.md` and `contracts/openapi.yaml` were defined before any implementation was written
 2. **Generate** — `src/pricing_discount_service.py` was generated to satisfy the tests and contract
-3. **Operate** — the capsule runs; fitness functions measure entropy
-4. **Measure** — `make fitness` produces a composite entropy score
-5. **Regenerate** — when entropy exceeds the threshold, `regeneration-recipe.md` guides safe regeneration
+3. **Operate** — the capsule runs; fitness functions measure decay signals
+4. **Measure** — `make fitness` produces a signal dashboard
+5. **Regenerate** — when the dashboard indicates regeneration, `regeneration-recipe.md` guides safe regeneration
 
 ## What Makes This Capsule Regenerable
 

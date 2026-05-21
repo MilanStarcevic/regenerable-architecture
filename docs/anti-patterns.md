@@ -6,7 +6,7 @@ and regeneration mechanisms are present but not acted on.
 
 ---
 
-## 1. Distributed Entropy
+## 1. Distributed Data Ownership
 
 **Description:** Every disposable capability capsule owns its own canonical database. As capsules
 proliferate, the system accumulates many small databases with duplicated domain models, inconsistent
@@ -53,7 +53,7 @@ input to generation; the durable artifacts are the specification.
 **Description:** The implementation is deleted and regenerated without a strong behavioral test
 suite to verify correctness of the new version.
 
-**Why it happens:** The entropy score is high. The implementation is a mess. The temptation is to start
+**Why it happens:** The signal dashboard indicates regeneration. The implementation is a mess. The temptation is to start
 fresh. Regeneration begins without strengthening the test suite first.
 
 **Consequences:**
@@ -102,7 +102,7 @@ tests are too shallow to catch the drift.
 - The code is correct by its own internal logic but incorrect relative to the business
 - New developers cannot map the code back to the specification
 - Future regeneration will produce code that matches the current drifted state, not the original intent
-- The entropy score may not reflect semantic drift if the semantic drift check is weak
+- The signal dashboard may not reflect semantic drift if the semantic drift check is weak
 
 **Solution:** Write tests that use domain vocabulary. Include semantic drift checks in the fitness
 functions. Review `intent.md` when making changes. Use the regeneration recipe as a check: if you
@@ -135,20 +135,20 @@ as a service only when the isolation genuinely justifies the cost.
 ## 7. Fitness Function Theater
 
 **Description:** Fitness functions are created but never run. Or they run and always produce green
-results because the thresholds are set too high. The entropy score is measured but never acted upon.
+results because the thresholds are set too high. The signal dashboard is observed but never acted upon.
 
 **Why it happens:** Adding fitness functions is visible work. Running them on a schedule and acting
 on the results requires operational commitment. The measurement infrastructure is built without the
 process infrastructure to respond.
 
 **Consequences:**
-- Implementation entropy accumulates without triggering any action
+- Implementation decay accumulates without triggering any action
 - The architecture has the appearance of discipline without the substance
 - When a crisis occurs, the fitness functions are discovered to be miscalibrated
 
-**Solution:** Set thresholds that reflect genuine concern. Review fitness function results in the
+**Solution:** Set thresholds that reflect genuine concern. Review signal dashboard results in the
 same cadence as other architectural reviews. Create an explicit process for what happens when the
-entropy score crosses each threshold.
+dashboard indicates regeneration.
 
 ---
 

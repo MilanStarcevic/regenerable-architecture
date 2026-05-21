@@ -1,11 +1,11 @@
 # Artifact Drift Fitness Functions
 
 Artifact drift functions are automated checks that measure the internal consistency of the durable
-artifact layer in a capability capsule. They answer a different question from implementation entropy fitness
+artifact layer in a capability capsule. They answer a different question from implementation decay fitness
 functions: not "is the implementation decaying?" but "are the artifacts from which we regenerate
 still trustworthy?"
 
-This matters because a capsule can have a zero entropy score and still be unsafe to regenerate — if
+This matters because a capsule can have a healthy signal dashboard and still be unsafe to regenerate — if
 `intent.md` has drifted from the tests, or the regeneration recipe points to files that no longer
 exist, or a dependency's behavior has changed while the declared stubs have not. Implementation
 fitness measures what was built. Artifact drift measures whether you could safely build it again.
@@ -16,7 +16,7 @@ This document defines:
 2. **The two tiers** — mechanical checks and LLM-assisted checks, when to run each
 3. **The eight signals** — what to measure, why it matters, and how to approach it
 4. **The composite artifact drift score** — how signals combine into a regeneration gate
-5. **The relationship to implementation entropy fitness** — how the two scores interact
+5. **The relationship to implementation decay fitness** — how the two scores interact
 
 ---
 
@@ -85,12 +85,12 @@ Normalized to 0–100. All signals are additive penalties: a score of 0 means al
 
 | Score | Status | Action |
 | --- | --- | --- |
-| 0 | Fully consistent | Regeneration safe (subject to entropy threshold) |
+| 0 | Fully consistent | Regeneration safe (subject to signal dashboard policy) |
 | 1–15 | Minor drift | Investigate and resolve before next regeneration |
 | 16–30 | Moderate drift | Resolve before regenerating; do not regenerate until addressed |
 | 31–100 | Severe drift | Regeneration unsafe; strengthen durable artifacts first |
 
-**The threshold for blocking regeneration is low.** A entropy score of 50 may still permit regeneration
+**The threshold for blocking regeneration is low.** A signal dashboard showing partial warnings may still permit regeneration
 with care. An artifact drift score of 20 should block it: artifacts that are wrong produce
 implementations that are wrong in ways the tests will not catch. This is the failure mode the
 architecture is specifically designed to avoid.
@@ -107,7 +107,7 @@ are: `intent.md`, `regeneration-recipe.md`, `ports/inbound/openapi.yaml`,
 `tests/test_contract.py`.
 
 **Why it matters:** A capsule missing any of these is structurally not regenerable, regardless of
-what the entropy score says. The regeneration recipe cannot be followed if the artifacts it references
+what the signal dashboard shows. The regeneration recipe cannot be followed if the artifacts it references
 do not exist. The score for this check is binary per file: each missing required artifact
 contributes a fixed penalty.
 
@@ -264,24 +264,24 @@ current durable artifacts.
 
 ---
 
-## Relationship to Implementation Entropy Fitness
+## Relationship to Implementation Decay Fitness
 
 The two scores measure orthogonal things and should be read together, not averaged.
 
-| Entropy Score | Artifact Drift Score | Meaning |
+| Signal Dashboard | Artifact Drift Score | Meaning |
 | --- | --- | --- |
-| Low | Low | Healthy. Maintain. |
-| High | Low | Implementation has decayed. Regeneration is safe and indicated. |
-| Low | High | Implementation looks healthy but artifacts are drifted. **Do not regenerate.** Strengthen durable artifacts first. |
-| High | High | Most dangerous state. Regeneration is needed but unsafe. Strengthen durable artifacts first, then regenerate. |
+| Healthy | Low | Healthy. Maintain. |
+| Indicates regeneration | Low | Implementation has decayed. Regeneration is safe and indicated. |
+| Healthy | High | Implementation looks healthy but artifacts are drifted. **Do not regenerate.** Strengthen durable artifacts first. |
+| Indicates regeneration | High | Most dangerous state. Regeneration is needed but unsafe. Strengthen durable artifacts first, then regenerate. |
 
-The high implementation entropy / high artifact drift case is the failure mode the architecture most needs to protect
-against. An undisciplined team facing this condition is tempted to regenerate because the entropy is
-high. The regeneration fails silently: a new, clean implementation guided by inconsistent artifacts.
+The high-decay / high artifact drift case is the failure mode the architecture most needs to protect
+against. An undisciplined team facing this condition is tempted to regenerate because the decay signals are
+elevated. The regeneration fails silently: a new, clean implementation guided by inconsistent artifacts.
 The result is an implementation that passes old tests, satisfies a drifted contract, and does not
 match current business intent.
 
-**Artifact drift must gate regeneration. Entropy scores alone do not.**
+**Artifact drift must gate regeneration. The signal dashboard alone does not.**
 
 ---
 

@@ -1,5 +1,13 @@
 # Order Capsule
 
+**Role in the two-capsule pair:** Dependent capsule. Consumes the pricing-discount-capsule via a
+declared outbound port. This is the more complex of the two examples. It shows outbound port
+declarations, stub-driven acceptance tests, integration tests against a real dependency, and how
+the system manifest captures inter-capsule relationships. It does not show how the minimal leaf
+capsule structure looks — see the pricing-discount-capsule for that.
+
+---
+
 A working example of a **multi-capsule system** in Regenerable Architecture.
 
 This capsule places customer orders and delegates discount calculation to the
@@ -50,7 +58,7 @@ python3 -m pytest examples/order-capsule/tests/ -v
 ## Running the Fitness Functions
 
 ```bash
-python3 examples/order-capsule/fitness/entropy_score.py
+python3 examples/order-capsule/fitness/decay_dashboard.py
 ```
 
 ## How the Outbound Port Works

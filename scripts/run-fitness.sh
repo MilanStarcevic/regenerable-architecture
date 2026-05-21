@@ -13,4 +13,4 @@ TARGET="${1:-$REPO_ROOT/examples/pricing-discount-capsule}"
 echo "Running fitness functions against: $TARGET"
 echo "---"
 
-python3 "$TARGET/fitness/entropy_score.py"
+python3 "$TARGET/fitness/decay_dashboard.py"

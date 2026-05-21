@@ -9,8 +9,8 @@ regenerated from those preserved artifacts rather than refactored in place.
 
 The individual ingredients are established: evolutionary architecture, fitness functions,
 contract-first design, disposable infrastructure, code generation. The synthesis is the AI-era
-lifecycle that ties them together: *specify → generate → operate → measure entropy → regenerate*. See
-[docs/concept.md](docs/concept.md) for the full concept.
+lifecycle that ties them together: *specify → generate → operate → measure decay signals →
+regenerate*. See [docs/concept.md](docs/concept.md) for the full concept.
 
 ---
 
@@ -36,6 +36,14 @@ production readiness.
 
 ---
 
+## Cost and Overhead
+
+This pattern carries a real, ongoing documentation tax. Per capsule, teams must maintain intent, contracts, behavioral tests, invariant tests, a regeneration recipe, and signal dashboard thresholds — all of which must stay current as the domain evolves. A stale durable artifact produces a wrong implementation when regeneration is attempted.
+
+The bet is that this maintenance cost is less than the cost of debugging and rewriting decayed AI-generated code. That bet pays off when regeneration occurs often enough to amortize the discipline. It does not pay off when the team is small, the product is in early discovery, or regeneration would be rare. See [docs/cost-and-overhead.md](docs/cost-and-overhead.md) for the full treatment and contraindications.
+
+---
+
 ## Why This Exists
 
 AI coding tools make generating implementation code cheap. The problem is not the cost of
@@ -49,7 +57,7 @@ Over time, AI-generated code accumulates subtle problems:
 - Dependencies pulled in for one line of convenience
 - Tests that verify behavior the AI invented, not behavior the business requires
 
-This is **AI implementation entropy**: accumulated implementation decay that looks acceptable in isolation but erodes
+This is **AI implementation decay**: accumulated degradation that looks acceptable in isolation but erodes
 the system's trustworthiness over time.
 
 The problem compounds in teams. When multiple developers each use AI tools on the same codebase,
@@ -73,8 +81,8 @@ Regenerable Architecture provides that design.
 flowchart LR
     A[Specify] --> B[Generate]
     B --> C[Operate]
-    C --> D[Measure Entropy]
-    D --> E{Entropy Above Threshold?}
+    C --> D[Measure Decay Signals]
+    D --> E{Regeneration Indicated?}
     E -- No --> C
     E -- Yes --> F[Regenerate Implementation]
     F --> C
@@ -104,7 +112,7 @@ flowchart TB
     end
 
     Durable --> Disposable
-    Disposable --> Metrics[Runtime Metrics and Entropy Signals]
+    Disposable --> Metrics[Runtime Metrics and Decay Signals]
     Metrics --> Durable
 ```
 
@@ -152,12 +160,20 @@ justifies the overhead.
 
 ---
 
-## What Is AI Implementation Entropy?
+## The Regeneration Recipe
 
-**AI implementation entropy** is the accumulation of small, individually defensible implementation choices that
+The **regeneration recipe** is the version-controlled instructions for recreating a capsule's implementation from its durable artifacts. It makes regeneration repeatable rather than ad hoc — especially through its "Known regeneration hazards" section, which accumulates the specific ways this capsule's generator has historically failed. Every failed regeneration should produce at least one new entry.
+
+See [`docs/regeneration-recipe-guide.md`](docs/regeneration-recipe-guide.md) for what makes a recipe good, and the worked examples in [`examples/pricing-discount-capsule/regeneration-recipe.md`](examples/pricing-discount-capsule/regeneration-recipe.md) and [`examples/order-capsule/regeneration-recipe.md`](examples/order-capsule/regeneration-recipe.md).
+
+---
+
+## What Is AI Implementation Decay?
+
+**AI implementation decay** is the accumulation of small, individually defensible implementation choices that
 together erode the quality and trustworthiness of a system.
 
-It is the natural byproduct of generation without architectural discipline. See [docs/implementation-entropy.md](docs/implementation-entropy.md) for a detailed taxonomy.
+It is the natural byproduct of generation without architectural discipline. See [docs/implementation-decay.md](docs/implementation-decay.md) for a detailed taxonomy.
 
 ---
 
@@ -171,49 +187,51 @@ contract and can be run from the same runner.
 Measures whether the implementation layer has decayed to the point where regeneration is safer than
 further refactoring.
 
-### Entropy Score Formula
+### Implementation Decay Signals
 
-```
-Entropy Score =
-  complexity_score
-+ duplication_score
-+ dependency_score
-+ semantic_drift_score
-+ changeability_score
-- test_confidence_score
-```
+The five mechanical signals each carry their own status: `healthy`, `watch`, `warning`, or
+`critical`. They do not combine into a single number. A signal dashboard presents them side by side;
+regeneration is triggered by a policy evaluated across that dashboard.
 
-Normalized to 0–100. Test confidence is subtracted because strong tests reduce the risk that entropy
-has caused undetected behavioral drift.
+The signals are qualitatively different and do not share units — complexity accumulates in function
+structure, duplication accumulates in code blocks, dependency accumulation is a count, test
+confidence is an inverted coverage measure, and changeability tracks churn. Summing them into a
+single score invites argument about the arithmetic rather than about the thresholds. A dashboard
+makes asymmetric, domain-specific calibration natural.
 
-| Score | Status | Recommended Action |
+| Signal | Measures | `critical` means |
 |---|---|---|
-| 0–30 | Healthy | Maintain |
-| 31–50 | Watch | Monitor trends |
-| 51–70 | Warning | Refactor |
-| 71–85 | High | Regenerate |
-| 86–100 | Critical | Urgent regeneration |
+| Complexity | Function length, branching, nesting depth | Structural complexity makes the implementation unreliable to modify |
+| Duplication | Repeated lines and duplicate code blocks | A rule change will likely be applied inconsistently across copies |
+| Dependency accumulation | External import count, discouraged libraries | Regeneration surface is wide or discouraged libraries are present |
+| Test confidence | Behavioral test coverage, suite pass/fail | Tests are insufficient to verify a regenerated implementation |
+| Changeability | Git churn, TODO/FIXME/HACK markers | Implementation thrash that targeted editing cannot resolve |
 
-Thresholds are configurable. A team with comprehensive test coverage may tolerate higher complexity;
-a regulated-domain team may want stricter thresholds on semantic drift.
+**Default regeneration policy.** Regenerate when any one of the following holds: a judgment signal
+is in `warning` or `critical`; two or more mechanical signals are in `warning`; any single
+mechanical signal is in `critical`. This policy is a calibration starting point. Teams should expect
+to adjust it after the first few regeneration cycles, based on observed false positives and false
+negatives.
 
-See [fitness-functions/README.md](fitness-functions/README.md) for the signal specification,
-interface contract, and tool alternatives (SonarQube, ESLint, Roslyn analyzers, and others). The
-reference Python implementation is in
+Semantic drift — whether the implementation has behaviorally diverged from `intent.md` — is a
+judgment signal, not a mechanical one. It runs at the pre-regeneration gate rather than on every
+commit. See [fitness-functions/README.md](fitness-functions/README.md) for the full signal
+specification, per-signal status descriptions, and tool alternatives (SonarQube, ESLint, Roslyn
+analyzers, and others). The reference Python implementation is in
 [examples/pricing-discount-capsule/fitness/](examples/pricing-discount-capsule/fitness/).
 
 ### Artifact Drift Fitness
 
 Measures whether the durable artifacts themselves are internally consistent — whether intent, tests,
-contracts, stubs, and the regeneration recipe still describe the same capsule. A capsule with low
-entropy but a high artifact drift score is unsafe to regenerate: the regenerated implementation will be
-guided by inconsistent artifacts and will fail in ways the tests do not catch.
+contracts, stubs, and the regeneration recipe still describe the same capsule. A capsule with a
+healthy signal dashboard but a high artifact drift score is unsafe to regenerate: the regenerated
+implementation will be guided by inconsistent artifacts and will fail in ways the tests do not catch.
 
 Artifact drift checks run in two tiers: mechanical checks (file integrity, contract coverage, stub
 consistency) run continuously in CI; LLM-assisted checks (intent-test alignment, contract-intent
 alignment, recipe currency) run as a pre-regeneration gate.
 
-**Artifact drift must gate regeneration. Entropy scores alone do not.**
+**Artifact drift must gate regeneration. The signal dashboard alone does not.**
 
 See [fitness-functions/artifact-drift.md](fitness-functions/artifact-drift.md) for the full
 specification.
@@ -227,7 +245,7 @@ flowchart TD
     A[Change Request] --> B{Tests and Contracts Strong?}
     B -- No --> C[Strengthen Durable Artifacts First]
     C --> B
-    B -- Yes --> D{Entropy Score High?}
+    B -- Yes --> D{Dashboard Indicates Regeneration?}
     D -- No --> E[Modify Existing Implementation]
     D -- Yes --> F[Regenerate from Durable Artifacts]
     F --> G[Run Fitness Functions]
@@ -238,12 +256,12 @@ flowchart TD
 ```
 
 **Refactor** when:
-- The entropy score is low
+- The signal dashboard shows all mechanical signals healthy or watch
 - The change is localized and the logic is well-understood
 - The existing implementation is a reasonable foundation for the change
 
 **Regenerate** when:
-- The entropy score is above the regeneration threshold
+- The dashboard policy triggers regeneration
 - The implementation has diverged from intent widely enough that surgery is riskier than a clean start
 - A significant requirement change makes the existing structure a poor foundation
 - You cannot confidently explain what the current implementation does
@@ -258,7 +276,7 @@ the same or different behavioral gaps—and no way to detect them.
 
 When a system has many capability capsules, data ownership becomes a systemic concern.
 
-The anti-pattern to avoid is **distributed entropy**: each disposable capsule owns its own canonical
+The anti-pattern to avoid is **distributed data ownership**: each disposable capsule owns its own canonical
 database, leading to duplicated domain models, inconsistent data semantics, and unresolvable
 conflicts when capsules need to be reconciled or regenerated.
 
@@ -289,7 +307,7 @@ regenerable-architecture/
 ├── docs/
 │   ├── concept.md                          ← in-depth explanation of the architecture
 │   ├── novelty.md                          ← what is new, what is borrowed
-│   ├── implementation-entropy.md           ← taxonomy of AI implementation entropy patterns
+│   ├── implementation-decay.md             ← taxonomy of AI implementation decay patterns
 │   ├── data-strategies.md                  ← data ownership strategies for capsule systems
 │   ├── anti-patterns.md                    ← failure modes and how to avoid them
 │   ├── cheat-sheet.md                      ← single-page architect reference
@@ -314,7 +332,7 @@ regenerable-architecture/
 │   │   │   ├── test_contract.py     ← durable: contract conformance
 │   │   │   └── test_invariants.py   ← durable: invariant tests
 │   │   ├── fitness/
-│   │   │   ├── entropy_score.py              ← durable: implementation entropy fitness runner
+│   │   │   ├── decay_dashboard.py            ← durable: implementation decay signal dashboard
 │   │   │   ├── artifact_drift.py          ← durable: artifact drift runner
 │   │   │   ├── complexity_check.py
 │   │   │   ├── duplication_check.py
@@ -346,7 +364,7 @@ regenerable-architecture/
 │       ├── fitness/
 │       └── README.md
 ├── fitness-functions/
-│   ├── README.md                ← entropy signal spec and tool alternatives (language-agnostic)
+│   ├── README.md                ← decay signal spec and tool alternatives (language-agnostic)
 │   └── artifact-drift.md        ← artifact drift signal spec and interface contract
 ├── scripts/
 │   ├── run-fitness.sh
@@ -364,12 +382,24 @@ preserves the dependency graph across all capsules.
 
 ## About the Examples
 
-The examples are deliberately small. Their purpose is to make the architectural pattern concrete and
-reviewable — not to demonstrate production readiness or developer usability.
+The repository includes two example capsules. Together they exercise every durable artifact type in
+the pattern. They are reference structure, not demonstrations of value.
 
-A real capability capsule would have more complex domain logic, richer test suites, and more
-detailed regeneration recipes. The examples show the structure and the artifact relationships. They
-are reference points for understanding, not templates to copy directly into production systems.
+**`pricing-discount-capsule`** — minimal leaf capsule. Shows the artifact layout for a capsule
+with no outbound dependencies. Use it to inspect what `intent.md`, an inbound contract, behavioral
+tests, invariant tests, and a fitness dashboard look like in the smallest useful configuration.
+
+**`order-capsule`** — dependent capsule. Consumes `pricing-discount-capsule` via a declared outbound
+port. Shows the outbound port declaration, the integration test pattern against a real dependency,
+and how the system manifest ties two capsules together.
+
+Together, these two are the smallest configuration that exercises every durable artifact type in the
+pattern. Reducing to one capsule would hide outbound ports, the integration test pattern, and the
+system manifest — the artifacts that distinguish this pattern from "write good tests and regenerate."
+
+The examples are deliberately small. They cannot demonstrate decay accumulating over time, the value
+of a regeneration cycle, or the failure modes that emerge at scale. For those dynamics, see
+[`docs/walkthrough.md`](docs/walkthrough.md).
 
 ---
 
@@ -377,14 +407,17 @@ are reference points for understanding, not templates to copy directly into prod
 
 Suggested order for first-time consumption:
 
-1. **README.md** *(this file)* — lifecycle, core concepts, two-score model
-2. **[docs/concept.md](docs/concept.md)** — ports, multi-capsule systems, two-score interaction
+1. **README.md** *(this file)* — lifecycle, core concepts, signal dashboard
+2. **[docs/concept.md](docs/concept.md)** — ports, multi-capsule systems, artifact drift interaction
 3. **[docs/when-not-to-use.md](docs/when-not-to-use.md)** — assess whether the pattern fits your context
 4. **[docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md)** — evaluate a proposed capsule boundary
 5. **[docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md)** — understand the pre-regeneration gate
 6. **[system.yaml](system.yaml)** — see how the dependency graph is declared
 7. **[examples/pricing-discount-capsule/](examples/pricing-discount-capsule/)** — inspect a leaf capsule end to end
 8. **[examples/order-capsule/](examples/order-capsule/)** — inspect a dependent capsule and its outbound declarations
+9. **[docs/regeneration-recipe-guide.md](docs/regeneration-recipe-guide.md)** — understand what makes a recipe good before reading the worked examples
+10. **[examples/pricing-discount-capsule/regeneration-recipe.md](examples/pricing-discount-capsule/regeneration-recipe.md)** — worked recipe for a leaf capsule
+11. **[examples/order-capsule/regeneration-recipe.md](examples/order-capsule/regeneration-recipe.md)** — worked recipe for a dependent capsule, with outbound dependency handling
 
 If you want to go deeper on a specific concern:
 
@@ -411,24 +444,26 @@ make fitness
 make demo
 ```
 
-Expected output from `make fitness`:
+Expected output from `make fitness` (pricing-discount-capsule):
 
 ```json
 {
-  "complexity_score": 14.1,
-  "duplication_score": 9.9,
-  "dependency_score": 16.0,
-  "semantic_drift_score": 4.3,
-  "changeability_score": 11.0,
-  "test_confidence_score": 100.0,
-  "entropy_score": 0,
-  "status": "healthy",
-  "recommended_action": "maintain"
+  "signals": {
+    "complexity":              { "raw": 14.1,  "status": "healthy", "note": "5 file(s); 22 branches; max nesting 3" },
+    "duplication":             { "raw": 9.9,   "status": "healthy", "note": "no duplicate blocks or lines detected" },
+    "dependency_accumulation": { "raw": 16.7,  "status": "healthy", "note": "1 external import(s)" },
+    "test_confidence":         { "raw": 100.0, "status": "healthy", "note": "43 tests; acceptance tests present; invariant tests present" },
+    "changeability":           { "raw": 13.0,  "status": "healthy", "note": "no deferred markers; low recent churn" },
+    "semantic_drift":          { "raw": 4.3,   "status": "healthy", "note": "vocabulary match: 93%; invariants covered", "kind": "judgment" }
+  },
+  "regeneration_indicated": false,
+  "policy_reason": "all signals within acceptable thresholds"
 }
 ```
 
-A `test_confidence_score` of 100 offsets the structural scores, producing a net entropy score of 0 —
-the expected result for a freshly specified, well-tested capsule.
+Each signal carries its own status. There is no composite score. The judgment signal (`semantic_drift`) appears at
+the bottom with `"kind": "judgment"` — it is evaluated separately at the pre-regeneration gate, not
+on every commit.
 
 See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the leaf capsule
 example, and [examples/order-capsule/](examples/order-capsule/) for a dependent capsule that
@@ -444,7 +479,7 @@ Each ingredient has existing names, tooling, and literature. The synthesis — n
 | Concept | Relationship |
 |---|---|
 | Evolutionary architecture | Parent concept; RA specializes it for AI-generated code and adds regeneration as a first-class event |
-| Architecture fitness functions | Used directly as the entropy measurement mechanism |
+| Architecture fitness functions | Used directly as the implementation decay measurement mechanism |
 | Contract-first development | Contracts are elevated from a design technique to a durable artifact |
 | Consumer-driven contracts | Informs why outbound port declarations must represent genuine consumer commitments |
 | Hexagonal architecture (ports and adapters) | Inbound/outbound port structure maps directly; adapters are disposable, ports are durable |
@@ -467,7 +502,7 @@ genuinely new in the synthesis.
 
 Full descriptions in [docs/anti-patterns.md](docs/anti-patterns.md). Key failure modes:
 
-- **Distributed entropy** — every capsule owns a canonical database; data conflicts become unresolvable
+- **Distributed data ownership** — every capsule owns a canonical database; data conflicts become unresolvable
 - **Prompt as specification** — the original prompt is treated as sufficient documentation; regeneration fails
 - **Regeneration without tests** — deleting and rebuilding code without strong behavioral tests is just risky rewriting
 - **Contract drift** — implementation changes behavior without updating the public contract
@@ -482,7 +517,7 @@ Full descriptions in [docs/anti-patterns.md](docs/anti-patterns.md). Key failure
 
 Reference artifacts for applying and evaluating the pattern:
 
-- [docs/cheat-sheet.md](docs/cheat-sheet.md) — single-page summary: when to use, two-score model, lifecycle, durable layer, adoption stages
+- [docs/cheat-sheet.md](docs/cheat-sheet.md) — single-page summary: when to use, signal dashboard, lifecycle, durable layer, adoption stages
 - [docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md) — evaluate whether a proposed capsule boundary is well-defined before writing the first artifact
 - [docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md) — verify that durable artifacts are strong enough to regenerate safely
 - [docs/adoption-maturity-model.md](docs/adoption-maturity-model.md) — understand how teams adopt the pattern incrementally, from no discipline to active regeneration lifecycle
@@ -494,7 +529,7 @@ Reference artifacts for applying and evaluating the pattern:
 
 Full discussion in [docs/open-questions.md](docs/open-questions.md). Key unresolved questions:
 
-- How do you detect semantic drift reliably without LLM-assisted review?
+- How do you calibrate the semantic drift LLM check's confidence thresholds to minimize false positives across different domain vocabularies?
 - What is the right granularity for a capability capsule?
 - How should fitness function thresholds evolve as a team and codebase mature?
 - How do you govern regeneration decisions in teams with many contributors?
