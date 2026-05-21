@@ -44,7 +44,7 @@ Over time, AI-generated code accumulates subtle problems:
 - Dependencies pulled in for one line of convenience
 - Tests that verify behavior the AI invented, not behavior the business requires
 
-This is **AI implementation decay**: accumulated degradation that looks acceptable in isolation but erodes
+This is **[AI implementation decay](docs/implementation-decay.md)**: accumulated degradation that looks acceptable in isolation but erodes
 the system's trustworthiness over time.
 
 The problem compounds in teams. When multiple developers each use AI tools on the same codebase,
@@ -150,15 +150,6 @@ See [`docs/regeneration-recipe-guide.md`](docs/regeneration-recipe-guide.md) for
 
 ---
 
-## What Is AI Implementation Decay?
-
-**AI implementation decay** is the accumulation of small, individually defensible implementation choices that
-together erode the quality and trustworthiness of a system.
-
-It is the natural byproduct of generation without architectural discipline. See [docs/implementation-decay.md](docs/implementation-decay.md) for a detailed taxonomy.
-
----
-
 ## Fitness Functions
 
 The architecture includes two complementary sets of fitness functions. Both use the same interface
@@ -236,6 +227,7 @@ flowchart TD
 - The signal dashboard shows all mechanical signals healthy or watch
 - The change is localized and the logic is well-understood
 - The existing implementation is a reasonable foundation for the change
+- You can confidently explain what the current implementation does and why
 
 **Regenerate** when:
 - The dashboard policy triggers regeneration
