@@ -182,11 +182,6 @@ It is the natural byproduct of generation without architectural discipline. See 
 The architecture includes two complementary sets of fitness functions. Both use the same interface
 contract and can be run from the same runner.
 
-### Implementation Fitness
-
-Measures whether the implementation layer has decayed to the point where regeneration is safer than
-further refactoring.
-
 ### Implementation Decay Signals
 
 The five mechanical signals each carry their own status: `healthy`, `watch`, `warning`, or
@@ -408,7 +403,7 @@ of a regeneration cycle, or the failure modes that emerge at scale. For those dy
 Suggested order for first-time consumption:
 
 1. **README.md** *(this file)* — lifecycle, core concepts, signal dashboard
-2. **[docs/concept.md](docs/concept.md)** — ports, multi-capsule systems, artifact drift interaction
+2. **[docs/concept.md](docs/concept.md)** — ports, multi-capsule systems, and how artifact drift gates regeneration
 3. **[docs/when-not-to-use.md](docs/when-not-to-use.md)** — assess whether the pattern fits your context
 4. **[docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md)** — evaluate a proposed capsule boundary
 5. **[docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md)** — understand the pre-regeneration gate
