@@ -91,7 +91,7 @@ Use [regeneration-readiness-checklist.md](regeneration-readiness-checklist.md). 
 - `intent.md` is current
 - Acceptance tests are behavioral and pass
 - Regeneration recipe references files that exist
-- Artifact drift score is below the block threshold (score < 16)
+- Artifact drift score is below the block threshold
 - Downstream consumers are identified and notified
 
 ---
