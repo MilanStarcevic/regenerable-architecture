@@ -108,7 +108,7 @@ routine.
 
 **What the team has added:** Regeneration is a routine event, not an emergency. Signal dashboard warnings
 trigger regeneration reviews. The team has regenerated capsules and observed that the
-results are correct. Durable health fitness is part of the CI pipeline. The adoption maturity model
+results are correct. Artifact drift fitness is part of the CI pipeline. The adoption maturity model
 is not a goal — it is a reference for onboarding.
 
 **What it enables:** The system degrades gracefully. Implementation quality does not compound

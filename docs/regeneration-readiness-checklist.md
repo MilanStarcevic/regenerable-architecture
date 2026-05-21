@@ -82,12 +82,12 @@ current capsule structure.
 
 ## 7. Artifact Drift Fitness
 
-- [ ] Durable health fitness has been run (Tier 1 mechanical checks)
+- [ ] Artifact drift fitness has been run (Tier 1 mechanical checks)
 - [ ] No Tier 1 failures are present
 - [ ] LLM-assisted artifact drift checks (Tier 2) have been run if available
 - [ ] No Tier 2 failures are present, or all failures are documented and accepted as known risk
 
-**Why this matters:** Durable health fitness catches inconsistencies between artifacts that cannot
+**Why this matters:** Artifact drift fitness catches inconsistencies between artifacts that cannot
 be detected from any single artifact. A high artifact drift score indicates the artifacts describe
 different capsules and regeneration will fail.
 
@@ -127,7 +127,7 @@ checklist did not catch. Having a recoverable prior state limits the blast radiu
 | Invariant and contract tests | | |
 | Integration tests | | |
 | Regeneration recipe | | |
-| Durable health fitness | | |
+| Artifact drift fitness | | |
 | Consumer impact | | |
 | Rollback plan | | |
 

@@ -35,7 +35,7 @@ regenerate. Artifact drift is high: strengthen artifacts first regardless of das
 ## The lifecycle
 
 ```
-Specify → Generate → Operate → Measure → Regenerate
+Specify → Generate → Operate → Measure Decay Signals → Regenerate
 ```
 
 | Phase | Primary artifact | Question |
@@ -91,7 +91,7 @@ Use [regeneration-readiness-checklist.md](regeneration-readiness-checklist.md). 
 - `intent.md` is current
 - Acceptance tests are behavioral and pass
 - Regeneration recipe references files that exist
-- Artifact drift score is below the block threshold
+- Artifact drift score is below the block threshold (score < 16)
 - Downstream consumers are identified and notified
 
 ---
