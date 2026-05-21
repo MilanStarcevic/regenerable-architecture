@@ -17,22 +17,9 @@ regenerate*. See [docs/concept.md](docs/concept.md) for the full concept.
 ## Who This Is For
 
 This repository is intended for **software architects, principal engineers, and technical leaders**
-exploring architectural responses to AI-generated implementation code.
+exploring architectural responses to AI-generated implementation code. It is conceptual and structural — a vocabulary, a lifecycle, and a set of artifacts for reasoning about AI-era systems — not a production framework, SDK, or platform to deploy.
 
-It is not intended to be a production framework, SDK, CLI, or developer productivity tool. The value
-here is conceptual and structural: a vocabulary, a lifecycle, and a set of artifacts for reasoning
-about AI-era systems — not a platform to deploy.
-
----
-
-## What This Is Not
-
-This repository does not provide a turnkey regeneration platform, a code-generation framework, or a
-universal scoring system. It does not automate the lifecycle. It does not replace the judgment
-required to define intent, write behavioral tests, or decide when to regenerate.
-
-The implementation is illustrative. It exists to make the pattern concrete, not to demonstrate
-production readiness.
+It does not automate the lifecycle or replace the judgment required to define intent, write behavioral tests, or decide when to regenerate. The implementation is illustrative: it exists to make the pattern concrete, not to demonstrate production readiness.
 
 ---
 
@@ -70,8 +57,6 @@ The answer to decay is not more code review. Reviewing every AI-generated line f
 correctness is expensive and unreliable. The answer is to design systems so that decayed
 implementation can be safely discarded and recreated—and to preserve the knowledge needed to do that
 safely.
-
-Regenerable Architecture provides that design.
 
 ---
 
@@ -140,9 +125,6 @@ flowchart TB
 | Framework glue | Can be rewritten for any framework that fits the contract |
 | Local optimizations | Should be re-derived after regeneration, not carried forward blindly |
 | Tests for implementation internals | Likely to break on regeneration for the wrong reasons |
-
-The implementation is not unimportant. It is just not the artifact that carries long-term trust. The
-durable layer carries that.
 
 ---
 
@@ -388,9 +370,7 @@ tests, invariant tests, and a fitness dashboard look like in the smallest useful
 port. Shows the outbound port declaration, the integration test pattern against a real dependency,
 and how the system manifest ties two capsules together.
 
-Together, these two are the smallest configuration that exercises every durable artifact type in the
-pattern. Reducing to one capsule would hide outbound ports, the integration test pattern, and the
-system manifest — the artifacts that distinguish this pattern from "write good tests and regenerate."
+Reducing to one capsule would hide outbound ports, the integration test pattern, and the system manifest — the artifacts that distinguish this pattern from "write good tests and regenerate."
 
 The examples are deliberately small. They cannot demonstrate decay accumulating over time, the value
 of a regeneration cycle, or the failure modes that emerge at scale. For those dynamics, see
@@ -456,14 +436,7 @@ Expected output from `make fitness` (pricing-discount-capsule):
 }
 ```
 
-Each signal carries its own status. There is no composite score. The judgment signal (`semantic_drift`) appears at
-the bottom with `"kind": "judgment"` — it is evaluated separately at the pre-regeneration gate, not
-on every commit.
-
-See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the leaf capsule
-example, and [examples/order-capsule/](examples/order-capsule/) for a dependent capsule that
-consumes it via a declared outbound port. The `system.yaml` at the repository root shows the
-dependency graph across both.
+See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the leaf capsule example and [examples/order-capsule/](examples/order-capsule/) for the dependent capsule.
 
 ---
 

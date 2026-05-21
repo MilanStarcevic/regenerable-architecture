@@ -19,8 +19,6 @@ See [docs/cost-and-overhead.md](cost-and-overhead.md) for a detailed treatment.
 
 ---
 
----
-
 ## Contraindications
 
 ### Exploratory or proof-of-concept work

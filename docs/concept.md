@@ -158,9 +158,7 @@ A note on the evaluating LLM's reliability: the concern "how can you trust an LL
 another LLM's output?" is reasonable, but the semantic drift check is a different task from
 generation. The evaluating LLM is not generating behavior; it is comparing a specific implementation
 against a specific `intent.md` that was written before the implementation existed. The ground truth
-is fixed and external to the LLM. That is a significantly more constrained and verifiable task than
-generation — and the structured output schema and confidence fields are designed to make the LLM's
-reasoning auditable rather than opaque.
+is fixed and external to the LLM — a more constrained and verifiable task than generation — and the structured output schema makes the assessment auditable.
 
 The two measures interact predictably:
 

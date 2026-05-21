@@ -78,9 +78,7 @@ point. The insight transfers; the tooling does not (yet).
 
 ### Infrastructure as Code
 
-IaC preserves the intent and specification of infrastructure in version-controlled, human-readable
-form. Regenerable Architecture applies the same logic to application code: the specification is
-durable and version-controlled; the generated output is reproducible from it.
+IaC preserves infrastructure intent in version-controlled form; Regenerable Architecture applies the same logic to application code.
 
 ### Data Mesh and Data Products
 
@@ -128,8 +126,7 @@ when.
 dependency growth, test confidence, and changeability as independent signals — each with its own
 status — and triggering regeneration by policy over the dashboard rather than by a composite number
 is a new mechanism. The individual checks are not new; the dashboard-based trigger for regeneration
-decisions is. Semantic drift is evaluated separately as a judgment signal at the pre-regeneration
-gate, where it can be assessed with LLM-assisted review rather than heuristics.
+decisions is.
 
 **4. The capability capsule as the unit of knowledge preservation.** The capsule bundles everything
 needed to specify, generate, and regenerate a single capability: intent, contract, tests, fitness
