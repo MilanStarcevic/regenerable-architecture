@@ -283,6 +283,7 @@ regenerable-architecture/
 │   ├── when-not-to-use.md                  ← contraindications for this pattern
 │   ├── capsule-assessment-checklist.md     ← evaluate a proposed capsule boundary
 │   ├── regeneration-readiness-checklist.md ← verify readiness before regenerating
+│   ├── regeneration-decision-record.md     ← template for recording regeneration decisions
 │   ├── adoption-maturity-model.md          ← staged adoption guide
 │   └── open-questions.md                   ← unresolved questions
 ├── examples/
@@ -480,6 +481,7 @@ Reference artifacts for applying and evaluating the pattern:
 - [docs/cheat-sheet.md](docs/cheat-sheet.md) — single-page summary: when to use, signal dashboard, lifecycle, durable layer, adoption stages
 - [docs/capsule-assessment-checklist.md](docs/capsule-assessment-checklist.md) — evaluate whether a proposed capsule boundary is well-defined before writing the first artifact
 - [docs/regeneration-readiness-checklist.md](docs/regeneration-readiness-checklist.md) — verify that durable artifacts are strong enough to regenerate safely
+- [docs/regeneration-decision-record.md](docs/regeneration-decision-record.md) — template for recording the trigger, readiness check, impact, and validation plan for each regeneration decision
 - [docs/adoption-maturity-model.md](docs/adoption-maturity-model.md) — understand how teams adopt the pattern incrementally, from no discipline to active regeneration lifecycle
 - [docs/when-not-to-use.md](docs/when-not-to-use.md) — recognize when the pattern is the wrong choice for the context
 
