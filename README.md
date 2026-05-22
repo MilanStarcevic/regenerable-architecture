@@ -405,28 +405,11 @@ make install
 # Run the behavioral, invariant, and contract test suite
 make test
 
-# Run fitness functions against the example capsule
+# Run fitness functions against both example capsules
 make fitness
 
 # Run tests + fitness together
 make demo
-```
-
-Expected output from `make fitness` (pricing-discount-capsule):
-
-```json
-{
-  "signals": {
-    "complexity":              { "raw": 14.1,  "status": "healthy", "note": "5 file(s); 22 branches; max nesting 3" },
-    "duplication":             { "raw": 9.9,   "status": "healthy", "note": "no duplicate blocks or lines detected" },
-    "dependency_accumulation": { "raw": 16.7,  "status": "healthy", "note": "1 external import(s)" },
-    "test_confidence":         { "raw": 100.0, "status": "healthy", "note": "43 tests; acceptance tests present; invariant tests present" },
-    "changeability":           { "raw": 13.0,  "status": "healthy", "note": "no deferred markers; low recent churn" },
-    "semantic_drift":          { "raw": 4.3,   "status": "healthy", "note": "vocabulary match: 93%; invariants covered", "kind": "judgment" }
-  },
-  "regeneration_indicated": false,
-  "policy_reason": "all signals within acceptable thresholds"
-}
 ```
 
 See [examples/pricing-discount-capsule/](examples/pricing-discount-capsule/) for the leaf capsule example and [examples/order-capsule/](examples/order-capsule/) for the dependent capsule.

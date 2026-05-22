@@ -124,7 +124,8 @@ def _make_note(signal_name: str, details: dict) -> str:
     elif signal_name == "changeability":
         todo = details.get("todo_count", 0)
         churn = details.get("churn_files_in_last_n_commits")
-        if todo == 0 and (churn is None or churn == 0):
+        score = details.get("score", 0.0)
+        if todo == 0 and score <= 20.0:
             return "no deferred markers; low recent churn"
         parts = [f"{todo} deferred marker(s)"]
         if churn is not None:
