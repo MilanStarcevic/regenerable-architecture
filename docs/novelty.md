@@ -1,9 +1,9 @@
 # Novelty: What Is and Is Not New
 
 Regenerable Architecture is honest about its ingredients. Most of them are established ideas with
-existing names, tooling, and literature. The novelty is the synthesis: a lifecycle specifically
-designed for AI-assisted systems where implementation generation is cheap, implementation decay is
-fast, and regeneration should be planned rather than avoided.
+existing names, tooling, and literature. It is not new because it uses tests, contracts, fitness
+functions, or code generation. It is new because it treats regeneration as a planned lifecycle event
+governed by durable artifacts and decay signals.
 
 ---
 
@@ -141,8 +141,9 @@ ad hoc.
 **6. LLM-judged semantic drift as a versioned, auditable check.** Using an LLM to compare an
 implementation against its `intent.md` — with a versioned prompt that is itself a durable artifact —
 is a new mechanism for detecting behavioral drift. The evaluating LLM is not grading itself; it is
-comparing a specific implementation against a specification that predates it. The structured output
-schema (drift findings, severity, confidence, rationale) makes the assessment auditable. A change
-to the evaluation prompt is treated as an architecture change, reviewed with the same rigor as a
-change to `intent.md` or the inbound contract.
+comparing a specific implementation against a specification that predates it. LLM-assisted semantic
+drift checks are decision support, not proof. The structured output schema (drift findings, severity,
+confidence, rationale) makes the assessment auditable and reviewable rather than opaque. A change to
+the evaluation prompt is treated as an architecture change, reviewed with the same rigor as a change
+to `intent.md` or the inbound contract.
 
